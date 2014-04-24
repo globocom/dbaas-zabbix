@@ -18,25 +18,25 @@ readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
-    name='dbaas-zabbix',
-    version='0.0.2',
+    name='dbaas_zabbix',
+    version='0.0.3',
     description='A Zabbix Integration for DBaaS.',
     long_description=readme + '\n\n' + history,
     author='Felippe Raposo',
     author_email='raposo.felippe@gmail.com',
-    url='https://github.com/felippemr'
+    url='https://github.com/globocom'
         '/dbaas-zabbix',
     packages=[
-        'dbaas-zabbix',
+        'dbaas_zabbix',
     ],
-    package_dir={'dbaas-zabbix':
-                 'dbaas-zabbix'},
+    package_dir={'dbaas_zabbix':
+                 'dbaas_zabbix'},
     include_package_data=True,
     install_requires=[
     ],
     license="BSD",
     zip_safe=False,
-    keywords='dbaas-zabbix',
+    keywords='dbaas_zabbix',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
