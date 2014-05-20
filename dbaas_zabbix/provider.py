@@ -28,12 +28,76 @@ class ZabbixProvider(object):
     def create_monitoring(self, dbinfra):
         if isinstance(dbinfra, DatabaseInfra):
             zapi = self.auth(dbinfra=dbinfra)
-            LOG.info("Creating zabbix monitoring...")
-            zapi.globo.createDBMonitors({"name" : dbinfra.name, "host" : dbinfra.endpoint, "dbtype" : "mysql"})
+            LOG.info("Creating zabbix monitoring for hosts...")
+            self.create_basic_monitors(zapi= zapi, dbinfra=dbinfra)
+
+            LOG.info("Creating zabbix monitoring for database...")
+            self.create_db_monitors(zapi= zapi, dbinfra=dbinfra)
 
     @classmethod
     def destroy_monitoring(self, dbinfra):
         if isinstance(dbinfra, DatabaseInfra):
-        	LOG.info("Destroying zabbix monitoring...")
-        	zapi = self.auth(dbinfra=dbinfra)
-        	zapi.globo.deleteMonitors({"host":dbinfra.name,})
+            LOG.info("Destroying zabbix monitoring...")
+            zapi = self.auth(dbinfra=dbinfra)
+            
+            self.destroy_basic_monitors(zapi= zapi, dbinfra= dbinfra)
+            self.destroy_db_monitors(zapi= zapi, dbinfra= dbinfra)
+
+            for ip in dbinfra.cs_dbinfra_attributes.all():
+                self.destroy_flipper_db_monitors(zapi= zapi, ip=ip)
+
+    @classmethod
+    def destroy_db_monitors(self, zapi, dbinfra):
+        instances = dbinfra.instances.all()
+        for instance in instances:
+            LOG.info("Destroying instance %s" % instance)
+            zapi.globo.deleteMonitors({"host":instance.address,})
+
+    @classmethod
+    def destroy_flipper_db_monitors(self, zapi, ip):
+        LOG.info("Destroying ip %s" % ip)
+        zapi.globo.deleteMonitors({"host":ip,})
+
+    @classmethod
+    def destroy_basic_monitors(self, zapi, dbinfra):
+        instances = dbinfra.instances.all()
+        for instance in instances:
+            host = instance.hostname
+            LOG.info("Destroying host %s" % host)
+            zapi.globo.deleteMonitors({"host":host.hostname,})
+
+    @classmethod
+    def create_db_monitors(self, zapi, dbinfra):
+        instances = dbinfra.instances.all()
+        flipper = 0
+        for instance in instances:
+            params = {"name" : instance.address, "host" : instance.address, "dbtype" : "mysql", "alarm" : "yes"}
+
+            if instances.count() > 1:
+                params['healthcheck'] = {   
+                                                            'host' : instance.address,        
+                                                            'port' : '8000',                   
+                                                            'string' : 'WORKING',    
+                                                            'uri' : 'health-check/monitor/'  
+                                                       }
+                zapi.globo.createDBMonitors(params)
+
+                if flipper == 0:
+                    LOG.info("Creating zabbix monitoring for flipper ips...")
+                    self.create_flipper_db_monitors(zapi= zapi, dbinfra=dbinfra)
+                    flipper=1
+            else:
+                zapi.globo.createDBMonitors(params)
+
+    @classmethod
+    def create_basic_monitors(self, zapi, dbinfra):
+        for instance in dbinfra.instances.all():
+            host = instance.hostname
+            zapi.globo.createBasicMonitors({"host": host.hostname, "ip": host.hostname})
+
+    @classmethod
+    def create_flipper_db_monitors(self, zapi, dbinfra):
+        for instance in dbinfra.cs_dbinfra_attributes.all():
+            params = {"name" : instance.ip, "host" : instance.ip, "dbtype" : "mysql", "alarm" : "yes"}
+            zapi.globo.createDBMonitors(params)
+
