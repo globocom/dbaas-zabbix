@@ -49,7 +49,10 @@ docs:
 
 release: clean
 	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+
+fake_deploy:
+	#rm /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/provider.pyc
+	cp dbaas_zabbix/provider.py /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/
 
 dist: clean
 	python setup.py sdist
