@@ -43,8 +43,8 @@ class ZabbixProvider(object):
             self.destroy_basic_monitors(zapi= zapi, dbinfra= dbinfra)
             self.destroy_db_monitors(zapi= zapi, dbinfra= dbinfra)
 
-            for ip in dbinfra.cs_dbinfra_attributes.all():
-                self.destroy_flipper_db_monitors(zapi= zapi, ip=ip)
+            for attrs in dbinfra.cs_dbinfra_attributes.all():
+                self.destroy_flipper_db_monitors(zapi= zapi, host=attrs.dns)
 
     @classmethod
     def destroy_db_monitors(self, zapi, dbinfra):
@@ -54,9 +54,9 @@ class ZabbixProvider(object):
             zapi.globo.deleteMonitors({"host":instance.address,})
 
     @classmethod
-    def destroy_flipper_db_monitors(self, zapi, ip):
-        LOG.info("Destroying ip %s" % ip)
-        zapi.globo.deleteMonitors({"host":ip,})
+    def destroy_flipper_db_monitors(self, zapi, host):
+        LOG.info("Destroying host %s" % host)
+        zapi.globo.deleteMonitors({"host": host,})
 
     @classmethod
     def destroy_basic_monitors(self, zapi, dbinfra):
@@ -71,11 +71,17 @@ class ZabbixProvider(object):
         instances = dbinfra.instances.all()
         flipper = 0
         for instance in instances:
-            params = {"name" : instance.address, "host" : instance.address, "dbtype" : "mysql", "alarm" : "yes"}
+            params = {"name" : instance.dns, "host" : instance.dns, "dbtype" : "mysql", "alarm" : "yes"}
 
             if instances.count() > 1:
                 params['healthcheck'] = {   
-                                                            'host' : instance.address,        
+                                                            'host' : instance.dns,        
+                                                            'port' : '8000',                   
+                                                            'string' : 'WORKING',    
+                                                            'uri' : 'health-check/'  
+                                                       }
+                params['healthcheck_monitor'] = {   
+                                                            'host' : instance.dns,        
                                                             'port' : '8000',                   
                                                             'string' : 'WORKING',    
                                                             'uri' : 'health-check/monitor/'  
@@ -93,11 +99,11 @@ class ZabbixProvider(object):
     def create_basic_monitors(self, zapi, dbinfra):
         for instance in dbinfra.instances.all():
             host = instance.hostname
-            zapi.globo.createBasicMonitors({"host": host.hostname, "ip": host.hostname})
+            zapi.globo.createBasicMonitors({"host": host.hostname, "ip": host.address})
 
     @classmethod
     def create_flipper_db_monitors(self, zapi, dbinfra):
         for instance in dbinfra.cs_dbinfra_attributes.all():
-            params = {"name" : instance.ip, "host" : instance.ip, "dbtype" : "mysql", "alarm" : "yes"}
+            params = {"name" : instance.dns, "host" : instance.dns, "dbtype" : "mysql", "alarm" : "yes"}
             zapi.globo.createDBMonitors(params)
 
