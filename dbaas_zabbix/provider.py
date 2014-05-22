@@ -51,7 +51,7 @@ class ZabbixProvider(object):
         instances = dbinfra.instances.all()
         for instance in instances:
             LOG.info("Destroying instance %s" % instance)
-            zapi.globo.deleteMonitors({"host":instance.address,})
+            zapi.globo.deleteMonitors({"host":instance.dns,})
 
     @classmethod
     def destroy_flipper_db_monitors(self, zapi, host):
