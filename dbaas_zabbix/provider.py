@@ -71,18 +71,19 @@ class ZabbixProvider(object):
         instances = dbinfra.instances.all()
         flipper = 0
         for instance in instances:
-            params = {"name" : instance.dns, "host" : instance.dns, "dbtype" : "mysql", "alarm" : "yes"}
+            LOG.info("Monitoring db instance %s" % instance)
+            params = {"host" : instance.dns, "dbtype" : "mysql", "alarm" : "yes"}
 
             if instances.count() > 1:
                 params['healthcheck'] = {   
                                                             'host' : instance.dns,        
-                                                            'port' : '8000',                   
+                                                            'port' : '80',                   
                                                             'string' : 'WORKING',    
                                                             'uri' : 'health-check/'  
                                                        }
                 params['healthcheck_monitor'] = {   
                                                             'host' : instance.dns,        
-                                                            'port' : '8000',                   
+                                                            'port' : '80',                   
                                                             'string' : 'WORKING',    
                                                             'uri' : 'health-check/monitor/'  
                                                        }
@@ -98,12 +99,14 @@ class ZabbixProvider(object):
     @classmethod
     def create_basic_monitors(self, zapi, dbinfra):
         for instance in dbinfra.instances.all():
+            LOG.info("Monitoring instances %s" % instance)
             host = instance.hostname
             zapi.globo.createBasicMonitors({"host": host.hostname, "ip": host.address})
 
     @classmethod
     def create_flipper_db_monitors(self, zapi, dbinfra):
         for instance in dbinfra.cs_dbinfra_attributes.all():
-            params = {"name" : instance.dns, "host" : instance.dns, "dbtype" : "mysql", "alarm" : "yes"}
+            LOG.info("Monitoring flipper ip instance %s" % instance)
+            params = {"host" : instance.dns, "dbtype" : "mysql", "alarm" : "yes"}
             zapi.globo.createDBMonitors(params)
 
