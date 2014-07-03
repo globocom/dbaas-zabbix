@@ -7,7 +7,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 class ZabbixProvider(object):
-    
+
     @classmethod
     def get_credentials(self, environment):
         LOG.info("Getting credentials...")
@@ -15,9 +15,9 @@ class ZabbixProvider(object):
         from dbaas_credentials.models import CredentialType
         integration = CredentialType.objects.get(type= CredentialType.ZABBIX)
         return Credential.get_credentials(environment= environment, integration= integration)
-    
+
     @classmethod
-    def auth(self, dbinfra): 
+    def auth(self, dbinfra):
         credentials = self.get_credentials(environment = dbinfra.environment)
 
         zapi = ZabbixAPI(server=credentials.endpoint, path="", log_level=6)
@@ -25,21 +25,21 @@ class ZabbixProvider(object):
         return zapi
 
     @classmethod
-    def create_monitoring(self, dbinfra):
+    def create_monitoring(self, dbinfra, dbtype="mysql"):
         if isinstance(dbinfra, DatabaseInfra):
             zapi = self.auth(dbinfra=dbinfra)
             LOG.info("Creating zabbix monitoring for hosts...")
             self.create_basic_monitors(zapi= zapi, dbinfra=dbinfra)
 
             LOG.info("Creating zabbix monitoring for database...")
-            self.create_db_monitors(zapi= zapi, dbinfra=dbinfra)
+            self.create_db_monitors(zapi= zapi, dbinfra=dbinfra, db_type=dbtype)
 
     @classmethod
     def destroy_monitoring(self, dbinfra):
         if isinstance(dbinfra, DatabaseInfra):
             LOG.info("Destroying zabbix monitoring...")
             zapi = self.auth(dbinfra=dbinfra)
-            
+
             self.destroy_basic_monitors(zapi= zapi, dbinfra= dbinfra)
             self.destroy_db_monitors(zapi= zapi, dbinfra= dbinfra)
 
@@ -67,29 +67,29 @@ class ZabbixProvider(object):
             zapi.globo.deleteMonitors({"host":host.hostname,})
 
     @classmethod
-    def create_db_monitors(self, zapi, dbinfra):
+    def create_db_monitors(self, zapi, dbinfra, dbtype):
         instances = dbinfra.instances.all()
         flipper = 0
         for instance in instances:
-            LOG.info("Monitoring db instance %s" % instance)
-            params = {"host" : instance.dns, "dbtype" : "mysql", "alarm" : "yes"}
+            LOG.info("Monitoring %s db instance %s" % (dbtype, instance))
+            params = {"host" : instance.dns, "dbtype" : dbtype, "alarm" : "yes"}
 
             if instances.count() > 1:
-                params['healthcheck'] = {   
-                                                            'host' : instance.dns,        
-                                                            'port' : '80',                   
-                                                            'string' : 'WORKING',    
-                                                            'uri' : 'health-check/'  
+                params['healthcheck'] = {
+                                                            'host' : instance.dns,
+                                                            'port' : '80',
+                                                            'string' : 'WORKING',
+                                                            'uri' : 'health-check/'
                                                        }
-                params['healthcheck_monitor'] = {   
-                                                            'host' : instance.dns,        
-                                                            'port' : '80',                   
-                                                            'string' : 'WORKING',    
-                                                            'uri' : 'health-check/monitor/'  
+                params['healthcheck_monitor'] = {
+                                                            'host' : instance.dns,
+                                                            'port' : '80',
+                                                            'string' : 'WORKING',
+                                                            'uri' : 'health-check/monitor/'
                                                        }
                 zapi.globo.createDBMonitors(params)
 
-                if flipper == 0:
+                if flipper == 0 and dbtype=="mysql":
                     LOG.info("Creating zabbix monitoring for flipper ips...")
                     self.create_flipper_db_monitors(zapi= zapi, dbinfra=dbinfra)
                     flipper=1
