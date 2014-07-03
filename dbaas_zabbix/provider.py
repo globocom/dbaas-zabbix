@@ -32,7 +32,7 @@ class ZabbixProvider(object):
             self.create_basic_monitors(zapi= zapi, dbinfra=dbinfra)
 
             LOG.info("Creating zabbix monitoring for database...")
-            self.create_db_monitors(zapi= zapi, dbinfra=dbinfra, db_type=dbtype)
+            self.create_db_monitors(zapi= zapi, dbinfra=dbinfra, dbtype=dbtype)
 
     @classmethod
     def destroy_monitoring(self, dbinfra):
