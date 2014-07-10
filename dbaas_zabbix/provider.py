@@ -74,7 +74,7 @@ class ZabbixProvider(object):
             LOG.info("Monitoring %s db instance %s" % (dbtype, instance))
             params = {"host" : instance.dns, "dbtype" : dbtype, "alarm" : "yes"}
 
-            if instances.count() > 1:
+            if instances.count() > 1 and dbtype=="mysql":
                 params['healthcheck'] = {
                                                             'host' : instance.dns,
                                                             'port' : '80',
