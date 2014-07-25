@@ -30,6 +30,9 @@ htmlcov
 # Translations
 *.mo
 
+# Pycharm
+.idea/*
+
 # Mr Developer
 .mr.developer.cfg
 .project
