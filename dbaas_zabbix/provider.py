@@ -20,6 +20,7 @@ class ZabbixProvider(object):
     def auth(self, dbinfra):
         credentials = self.get_credentials(environment = dbinfra.environment)
 
+        self.clientgroup = credentials.get_parameter_by_name("clientgroup")
         zapi = ZabbixAPI(server=credentials.endpoint, path="", log_level=6, timeout=60)
         zapi.login(credentials.user, credentials.password)
         return zapi
@@ -128,18 +129,13 @@ class ZabbixProvider(object):
                 "var": "redis-con",
                 "alarm" : "yes",
                 "notes": dbinfra.name,
+                "clientgroup": self.clientgroup,
             }
             zapi.globo.createWebMonitors(params)
             
-            params = {
-                "address" : instance.address,
-                "port" : "80",
-                "regexp" : "WORKING",
-                "uri": "/health-check/redis-mem/",
-                "var": "redis-mem",
-                "alarm" : "yes",
-                "notes": dbinfra.name,
-            }
+            params["uri"] = "/health-check/redis-mem/"
+            params["var"] = "redis-mem"
+            
             zapi.globo.createWebMonitors(params)
 
     @classmethod
@@ -147,7 +143,7 @@ class ZabbixProvider(object):
         for instance in dbinfra.instances.all():
             LOG.info("Monitoring instances %s" % instance)
             host = instance.hostname
-            zapi.globo.createBasicMonitors({"host": host.hostname, "ip": host.address})
+            zapi.globo.createBasicMonitors({"host": host.hostname, "ip": host.address, "clientgroup": self.clientgroup})
 
     @classmethod
     def create_flipper_db_monitors(self, zapi, dbinfra):
