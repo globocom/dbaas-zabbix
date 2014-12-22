@@ -20,7 +20,7 @@ class ZabbixProvider(object):
     def auth(self, dbinfra):
         credentials = self.get_credentials(environment = dbinfra.environment)
 
-        zapi = ZabbixAPI(server=credentials.endpoint,
+        zapi = ZabbixAPI(url=credentials.endpoint,
                 user=credentials.user,
                 password=credentials.password)
         return zapi
