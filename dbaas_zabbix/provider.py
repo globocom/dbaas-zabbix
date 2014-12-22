@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from zabbix_api import ZabbixAPI
+from zabbix_api import Zabbix as ZabbixAPI
 from physical.models import DatabaseInfra
 import logging
 
@@ -20,9 +20,9 @@ class ZabbixProvider(object):
     def auth(self, dbinfra):
         credentials = self.get_credentials(environment = dbinfra.environment)
 
-        self.clientgroup = credentials.get_parameter_by_name("clientgroup")
-        zapi = ZabbixAPI(server=credentials.endpoint, path="", log_level=6, timeout=60)
-        zapi.login(credentials.user, credentials.password)
+        zapi = ZabbixAPI(server=credentials.endpoint,
+                user=credentials.user,
+                password=credentials.password)
         return zapi
 
     @classmethod
@@ -58,20 +58,20 @@ class ZabbixProvider(object):
         instances = dbinfra.instances.all()
         for instance in instances:
             LOG.info("Destroying instance %s" % instance)
-            zapi.globo.deleteMonitors({"host":instance.dns,})
+            zapi.globo_deleteMonitors(params={"host":instance.dns,})
 
     @classmethod
     def destroy_db_monitors_redis(self, zapi, dbinfra):
         instances = dbinfra.instances.all()
         for instance in instances:
             LOG.info("Destroying instance %s" % instance)
-            zapi.globo.deleteMonitors({"host": "webmonitor_%s-80-redis-mem" % instance.address })
-            zapi.globo.deleteMonitors({"host": "webmonitor_%s-80-redis-con" % instance.address})
+            zapi.globo_deleteMonitors(params={"host": "webmonitor_%s-80-redis-mem" % instance.address })
+            zapi.globo_deleteMonitors(params={"host": "webmonitor_%s-80-redis-con" % instance.address})
 
     @classmethod
     def destroy_flipper_db_monitors(self, zapi, host):
         LOG.info("Destroying host %s" % host)
-        zapi.globo.deleteMonitors({"host": host,})
+        zapi.globo_deleteMonitors(params={"host": host,})
 
     @classmethod
     def destroy_basic_monitors(self, zapi, dbinfra):
@@ -79,10 +79,10 @@ class ZabbixProvider(object):
         for instance in instances:
             host = instance.hostname
             LOG.info("Destroying host %s" % host)
-            zapi.globo.deleteMonitors({"host":host.hostname,})
-    
+            zapi.globo_deleteMonitors(params={"host":host.hostname,})
+
     @classmethod
-    def create_db_monitors(self, zapi, dbinfra, dbtype):        
+    def create_db_monitors(self, zapi, dbinfra, dbtype):
         instances = dbinfra.instances.all()
         flipper = 0
         for instance in instances:
@@ -108,14 +108,14 @@ class ZabbixProvider(object):
                     'string' : 'WORKING',
                     'uri' : 'health-check/monitor/'
                 }
-                zapi.globo.createDBMonitors(params)
+                zapi.globo_createDBMonitors(params=params)
 
                 if flipper == 0 and dbtype=="mysql":
                     LOG.info("Creating zabbix monitoring for flipper ips...")
                     self.create_flipper_db_monitors(zapi= zapi, dbinfra=dbinfra)
                     flipper=1
             else:
-                zapi.globo.createDBMonitors(params)
+                zapi.globo.createDBMonitors(params=params)
 
     @classmethod
     def create_db_monitors_redis(self, zapi, dbinfra, dbtype):
@@ -131,24 +131,24 @@ class ZabbixProvider(object):
                 "notes": dbinfra.name,
                 "clientgroup": self.clientgroup,
             }
-            zapi.globo.createWebMonitors(params)
-            
+            zapi.globo_createWebMonitors(params=params)
+
             params["uri"] = "/health-check/redis-mem/"
             params["var"] = "redis-mem"
-            
-            zapi.globo.createWebMonitors(params)
+
+            zapi.globo_createWebMonitors(params=params)
 
     @classmethod
     def create_basic_monitors(self, zapi, dbinfra):
         for instance in dbinfra.instances.all():
             LOG.info("Monitoring instances %s" % instance)
             host = instance.hostname
-            zapi.globo.createBasicMonitors({"host": host.hostname, "ip": host.address, "clientgroup": self.clientgroup})
+            zapi.globo_createBasicMonitors(params={"host": host.hostname, "ip": host.address, "clientgroup": self.clientgroup})
 
     @classmethod
     def create_flipper_db_monitors(self, zapi, dbinfra):
         for instance in dbinfra.cs_dbinfra_attributes.all():
             LOG.info("Monitoring flipper ip instance %s" % instance)
             params = {"host" : instance.dns, "dbtype" : "mysql", "alarm" : "yes"}
-            zapi.globo.createDBMonitors(params)
+            zapi.globo_createDBMonitors(params=params)
 
