@@ -116,7 +116,7 @@ class ZabbixProvider(object):
                     self.create_flipper_db_monitors(zapi= zapi, dbinfra=dbinfra)
                     flipper=1
             else:
-                zapi.globo.createDBMonitors(params=params)
+                zapi.globo_createDBMonitors(params=params)
 
     @classmethod
     def create_db_monitors_redis(self, zapi, dbinfra, dbtype):
