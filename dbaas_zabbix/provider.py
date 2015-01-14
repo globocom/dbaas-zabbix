@@ -68,10 +68,10 @@ class ZabbixProvider(object):
         instances = dbinfra.instances.all()
         for instance in instances:
             LOG.info("Destroying instance %s" % instance)
-            if instance.database_type == Instance.REDIS:
+            if instance.instance_type == Instance.REDIS:
                 zapi.globo_deleteMonitors(params={"host": "webmonitor_%s-80-redis-mem" % instance.dns })
                 zapi.globo_deleteMonitors(params={"host": "webmonitor_%s-80-redis-con" % instance.dns})
-            elif instance.database_type == Instance.REDIS_SENTINEL:
+            elif instance.instance_type == Instance.REDIS_SENTINEL:
                 zapi.globo_deleteMonitors(params={"host": "webmonitor_%s-80-sentinel-con" % instance.dns})
 
     @classmethod
@@ -125,7 +125,7 @@ class ZabbixProvider(object):
     def create_db_monitors_redis(self, zapi, dbinfra, dbtype):
         instances = dbinfra.instances.all()
         for instance in instances:
-            if instance.database_type == Instance.REDIS:
+            if instance.instance_type == Instance.REDIS:
                 params = {
                     "address" : instance.dns,
                     "port" : "80",
@@ -144,7 +144,7 @@ class ZabbixProvider(object):
 
                 zapi.globo_createWebMonitors(params=params)
 
-            elif instance.database_type == Instance.REDIS_SENTINEL:
+            elif instance.instance_type == Instance.REDIS_SENTINEL:
                 params = {
                     "address" : instance.dns,
                     "port" : "80",
