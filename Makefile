@@ -25,10 +25,10 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 
 lint:
-	flake8 dbaas-zabbix tests
+	flake8 dbaas_zabbix tests
 
 test:
-	python setup.py test
+	nosetests -v tests/test_dbaas_zabbix.py
 
 test-all:
 	tox

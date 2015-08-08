@@ -1,7 +1,1 @@
-django==1.5.5
-wheel==0.22.0
-django-simple-audit==0.1.14
-South==0.8.2
-django-services==0.0.8
-dbaas_credentials==1.0.4
-requests==2.5.0
+pyzabbix==0.7.3
