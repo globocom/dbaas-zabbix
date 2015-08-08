@@ -34,7 +34,7 @@ test-all:
 	tox
 
 coverage:
-	coverage run --source dbaas-zabbix setup.py test
+	coverage run --source dbaas_zabbix setup.py test
 	coverage report -m
 	coverage html
 	open htmlcov/index.html
