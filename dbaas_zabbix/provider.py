@@ -114,12 +114,12 @@ class ZabbixProvider(DatabaseAsAServiceApi):
 
     @classmethod
     def create_monitoring(cls, ):
-        zabbix_provider = ZabbixProvider()
+        zabbix_provider = cls()
         zabbix_provider._create_basic_monitors()
         zabbix_provider.create_database_monitors()
 
     @classmethod
     def delete_monitoring(cls):
-        zabbix_provider = ZabbixProvider()
+        zabbix_provider = cls()
         zabbix_provider._delete_basic_monitors()
         zabbix_provider.delete_database_monitors()
