@@ -81,7 +81,8 @@ class TestZabbixApi(unittest.TestCase):
             self.assertEqual(method_called, method)
 
     def test_delete_database_monitors(self):
-        self.zabbix_provider._delete_database_monitors()
+        instances = self.zabbix_provider.get_all_instances()
+        self.zabbix_provider._delete_database_monitors(instances)
         last_calls = self.zabbix_provider.api.last_call
         self.assert_delete_database_monitors(last_calls)
 
