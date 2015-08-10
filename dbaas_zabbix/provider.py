@@ -33,6 +33,9 @@ class DatabaseAsAServiceApi(object):
     def get_databaseifra_name(self):
         return self.databaseinfra.name
 
+    def get_databaseinfra_secondary_ips(self):
+        return self.databaseinfra.cs_dbinfra_attributes.all()
+
 
 class ZabbixProvider(DatabaseAsAServiceApi):
 
@@ -50,6 +53,7 @@ class ZabbixProvider(DatabaseAsAServiceApi):
         return self.api.globo.createBasicMonitors(params)
 
     def __create_database_monitors(self, params):
+        LOG.info("Creating databse monitor with params: {}".format(params))
         return self.api.globo.createDBMonitors(params=params)
 
     def __create_web_monitors(self, params):
@@ -71,8 +75,8 @@ class ZabbixProvider(DatabaseAsAServiceApi):
             LOG.info("Destroying basic monitor for host: {}".format(host))
             self.__delete_monitors(params={"host": host.hostname})
 
-    def _delete_database_monitors(self, ):
-        for instance in self.get_all_instances():
+    def _delete_database_monitors(self, instances):
+        for instance in instances:
             msg = "Destroying database monitor for host: {}"
             LOG.info(msg.format(instance))
             self.__delete_monitors(params={"host": instance.dns})
