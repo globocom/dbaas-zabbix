@@ -30,6 +30,9 @@ class DatabaseAsAServiceApi(object):
     def get_environment(self):
         return self.databaseinfra.environment
 
+    def get_databaseifra_name(self):
+        return self.databaseinfra.name
+
 
 class ZabbixProvider(DatabaseAsAServiceApi):
 
