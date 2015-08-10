@@ -28,6 +28,7 @@ class DatabaseInfra(object):
     def __init__(self, instances, environment):
         self.instances = instances
         self.environment = environment
+        self.name = "fakeinfra"
 
     def get_driver(self):
         if hasattr(self, 'driver'):

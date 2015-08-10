@@ -98,5 +98,21 @@ class TestZabbixApi(unittest.TestCase):
             self.assertEqual(dns, instance.dns)
             self.assertEqual(method_called, method)
 
+    def test_create_web_monitors(self):
+        method = 'globo.createWebMonitors'
+        instance = self.zabbix_provider.get_all_instances()[0]
+        dbinfra_name = self.zabbix_provider.get_databaseifra_name()
+        params = {"address": instance.dns, "port": "80", "regexp": "WORKING",
+                  "uri": "/health-check/redis-con/", "var": "redis-con",
+                  "alarm": "yes", "notes": dbinfra_name,
+                  "clientgroup": [1, 2]}
+
+        self.zabbix_provider._ZabbixProvider__create_web_monitors(params)
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']['params']
+
+        self.assertEqual(last_call['method'], method)
+        self.assertEqual(params, last_call_params)
+
     def tearDown(self):
         pass
