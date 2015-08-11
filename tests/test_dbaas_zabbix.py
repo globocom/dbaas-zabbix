@@ -8,7 +8,7 @@ from tests import factory
 class TestDatabaseAsAServiceApi(unittest.TestCase):
     def setUp(self):
         self.databaseinfra = factory.set_up_databaseinfra()
-        self.dbaas_api = DatabaseAsAServiceApi(self.databaseinfra)
+        self.dbaas_api = DatabaseAsAServiceApi(self.databaseinfra, factory.FakeCredential())
 
     def test_get_all_instances(self):
         instances = self.dbaas_api.get_all_instances()
@@ -32,12 +32,8 @@ class TestZabbixApi(unittest.TestCase):
     def setUp(self):
         self.databaseinfra = factory.set_up_databaseinfra()
         zabbix_api = factory.FakeZabbixAPI
-        dbaas_api = DatabaseAsAServiceApi(self.databaseinfra)
-        self.zabbix_provider = factory.FakeZabbixProvider('fake_user',
-                                                          'fake_pas@123',
-                                                          'fake.endpoint.com',
-                                                          [1, 2],
-                                                          dbaas_api,
+        dbaas_api = DatabaseAsAServiceApi(self.databaseinfra, factory.FakeCredential())
+        self.zabbix_provider = factory.FakeZabbixProvider(dbaas_api,
                                                           zabbix_api)
 
     def test_create_basic_monitors(self):
@@ -59,7 +55,7 @@ class TestZabbixApi(unittest.TestCase):
 
             self.assertEqual(ip, host.address)
             self.assertEqual(hostname, host.hostname)
-            self.assertEqual(clientgroup, self.zabbix_provider.clientgroups)
+            self.assertEqual(clientgroup, self.zabbix_provider.clientgroup)
             self.assertEqual(method_called, method)
 
     def test_delete_monitors(self):

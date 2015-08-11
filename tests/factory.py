@@ -100,3 +100,13 @@ class FakeZabbixProvider(ZabbixProvider):
     def get_params_for_instance(self, instance, **kwargs):
         kwargs['address'] = instance.dns
         return kwargs
+
+
+class FakeCredential(object):
+        def __init__(self):
+            self.user = ''
+            self.password = ''
+            self.endpoint = ''
+
+        def get_parameter_by_name(self, name):
+            return ''
