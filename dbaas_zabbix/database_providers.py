@@ -6,12 +6,18 @@ LOG = logging.getLogger(__name__)
 
 
 class MySQLSingleZabbixProvider(ZabbixProvider):
+    __provider_name__ = 'mysql'
+    __is_ha__ = False
+
     def create_database_monitors(self,):
         instances = self.get_all_instances()
         self._create_database_monitors(instances, dbtype='mysql', alarm='no')
 
 
 class MySQLHighAvailabilityZabbixProvider(ZabbixProvider):
+    __provider_name__ = 'mysql'
+    __is_ha__ = True
+
     def get_params_for_instance(self, instance, **kwargs):
         host = instance.dns
         kwargs['host'] = host
@@ -43,6 +49,9 @@ class MySQLHighAvailabilityZabbixProvider(ZabbixProvider):
 
 
 class MongoDBSingleZabbixProvider(ZabbixProvider):
+    __provider_name__ = 'mongodb'
+    __is_ha__ = False
+
     def create_database_monitors(self, alarm='yes'):
         instances = self.get_all_instances()
         self._create_database_monitors(instances, dbtype='mongodb',
@@ -50,6 +59,9 @@ class MongoDBSingleZabbixProvider(ZabbixProvider):
 
 
 class MongoDBHighAvailabilityZabbixProvider(ZabbixProvider):
+    __provider_name__ = 'mongodb'
+    __is_ha__ = True
+
     def create_database_monitors(self, alarm='yes'):
         instances = self.get_database_instances()
         self._create_database_monitors(instances, dbtype='mongodb',
@@ -74,6 +86,9 @@ class RedisZabbixProvider(ZabbixProvider):
 
 
 class RedisSingleZabbixProvider(RedisZabbixProvider):
+    __provider_name__ = 'redis'
+    __is_ha__ = False
+
     def create_database_monitors(self, alarm='yes'):
         instances = self.get_database_instances()
         self._create_web_monitors(monitor_type='redis-con',
@@ -86,6 +101,9 @@ class RedisSingleZabbixProvider(RedisZabbixProvider):
 
 
 class RedisHighAvailabilityZabbixProvider(RedisZabbixProvider):
+    __provider_name__ = 'redis'
+    __is_ha__ = True
+
     def create_database_monitors(self, alarm='yes'):
         instances = self.get_database_instances()
 
