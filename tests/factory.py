@@ -1,5 +1,6 @@
 from dbaas_zabbix.provider import ZabbixProvider
 
+
 class Host(object):
     def __init__(self, address, dns):
         self.address = address
