@@ -39,7 +39,7 @@ class MySQLHighAvailabilityZabbixProvider(ZabbixProvider):
         del params['healthcheck_monitor']
 
         instances = self.get_databaseinfra_secondary_ips()
-        self.__create_database_monitors(instances, **params)
+        self._create_database_monitors(instances, **params)
 
 
 class MongoDBSingleZabbixProvider(ZabbixProvider):
@@ -85,15 +85,19 @@ class RedisSingleZabbixProvider(RedisZabbixProvider):
                                   alarm=alarm)
 
 
-class RedisHighAvailabilityZabbixProvider(ZabbixProvider):
+class RedisHighAvailabilityZabbixProvider(RedisZabbixProvider):
     def create_database_monitors(self, alarm='yes'):
         instances = self.get_database_instances()
 
-        self._create_web_monitors(monitor_type=['redis-mem', 'redis-con'],
+        self._create_web_monitors(monitor_type='redis-con',
+                                  instances=instances, regexp='WORKING',
+                                  alarm=alarm)
+
+        self._create_web_monitors(monitor_type='redis-mem',
                                   instances=instances, regexp='WORKING',
                                   alarm=alarm)
 
         instances = self.get_non_database_instances()
         self._create_web_monitors(instances=instances, regexp='WORKING',
-                                  monitor_type=['sentinel-con'], alarm=alarm
+                                  monitor_type='sentinel-con', alarm=alarm
                                   )
