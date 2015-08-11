@@ -1,5 +1,4 @@
 from dbaas_zabbix.custom_exceptions import NotImplementedError
-import sys
 from dbaas_zabbix import database_providers
 
 
