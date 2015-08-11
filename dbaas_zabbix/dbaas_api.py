@@ -2,16 +2,10 @@
 
 
 class DatabaseAsAServiceApi(object):
-    def __init__(self, databaseinfra, credentialtype):
+    def __init__(self, databaseinfra, credentials):
         self.databaseinfra = databaseinfra
-        self.credentialtype = credentialtype
         self.driver = self.get_databaseinfra_driver()
-        self.credentials = self.get_credentials()
-
-    def get_credentials(self):
-        from dbaas_credentials.credential import Credential
-        return Credential.get_credentials(environment=self.get_environment(),
-                                          integration=self.credentialtype)
+        self.credentials = credentials
 
     def get_credential_user(self):
         return self.credentials.user
