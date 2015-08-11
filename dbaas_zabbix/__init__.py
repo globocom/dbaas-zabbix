@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from dbaas_api import DatabaseAsAServiceApi
-from provider_factory import ProviderFactory
+from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
+from dbaas_zabbix.provider_factory import ProviderFactory
 
 
 def factory_for(**kwargs):
