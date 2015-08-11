@@ -24,10 +24,10 @@ class MySQLHighAvailabilityZabbixProvider(ZabbixProvider):
 
     def create_database_monitors(self, alarm='yes'):
         instances = self.get_database_instances()
-        params = {'dbtype': 'mysql', 'alarm': 'yes', 'arbiter': 0,
-                  'healthcheck': {'port': '80', 'string': 'WORKING',
-                                  'uri': 'health-check/'
-                                  },
+        params = {'dbtype': 'mysql', 'healthcheck': {'port': '80',
+                                                     'string': 'WORKING',
+                                                     'uri': 'health-check/'
+                                                     },
                   'healthcheck_monitor': {'port': '80', 'string': 'WORKING',
                                           'uri': 'health-check/monitor/'
                                           }
@@ -57,7 +57,7 @@ class MongoDBHighAvailabilityZabbixProvider(ZabbixProvider):
 
         instances = self.get_non_database_instances()
         self._create_database_monitors(instances, dbtype='mongodb',
-                                       alarm='yes', arbiter=1)
+                                       alarm='yes', arbiter='1')
 
 
 class RedisZabbixProvider(ZabbixProvider):
