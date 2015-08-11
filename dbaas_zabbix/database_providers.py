@@ -11,28 +11,34 @@ class MySQLSingleZabbixProvider(ZabbixProvider):
 
 
 class MySQLHighAvailabilityZabbixProvider(ZabbixProvider):
+    def get_params_for_instance(self, instance, **kwargs):
+        host = instance.dns
+        kwargs['host'] = host
+
+        if kwargs.get('healthcheck', d=None):
+            kwargs['healthcheck']['host'] = host
+            kwargs['healthcheck_monitor']['host'] = host
+
+        return kwargs
+
     def create_database_monitors(self, ):
-        for instance in self.get_database_instances():
-            params = {"host": instance.dns, "dbtype": 'mysql', "alarm": "yes",
-                      "arbiter": 0, }
-            params['healthcheck'] = {'host': instance.dns,
-                                     'port': '80',
-                                     'string': 'WORKING',
-                                     'uri': 'health-check/',
-                                     }
-            params['healthcheck_monitor'] = {'host': instance.dns,
-                                             'port': '80',
-                                             'string': 'WORKING',
-                                             'uri': 'health-check/monitor/',
-                                             }
+        instances = self.get_database_instances()
+        params = {'dbtype': 'mysql', 'alarm': 'yes', 'arbiter': 0,
+                  'healthcheck': {'port': '80', 'string': 'WORKING',
+                                  'uri': 'health-check/'
+                                  },
+                  'healthcheck_monitor': {'port': '80', 'string': 'WORKING',
+                                          'uri': 'health-check/monitor/'
+                                          }
+                  }
 
-            self.__create_database_monitors(params)
+        self._create_database_monitors(instances, **params)
 
-        for secondary_ip in self.get_databaseinfra_secondary_ips():
-            params = {"host": instance.dns, "dbtype": 'mysql', "alarm": "yes",
-                      "arbiter": 0}
+        del params['healthcheck']
+        del params['healthcheck_monitor']
 
-            self.__create_database_monitors(params)
+        instances = self.get_databaseinfra_secondary_ips()
+        self.__create_database_monitors(instances, **params)
 
 
 class MongoDBSingleZabbixProvider(ZabbixProvider):
@@ -42,24 +48,41 @@ class MongoDBSingleZabbixProvider(ZabbixProvider):
 
 class MongoDBHighAvailabilityZabbixProvider(ZabbixProvider):
     def create_database_monitors(self,):
-        self._create_database_monitors(dbtype='mongodb', alarm='yes')
+        instances = self.get_database_instances()
+        self._create_database_monitors(instances, dbtype='mongodb',
+                                       alarm='yes')
 
-        for arbiter in self.get_non_database_instances():
-            params = {"host": arbiter.dns, "dbtype": 'mongodb', "alarm": "yes",
-                      "arbiter": 1}
-            self.__create_database_monitors(params)
+        instances = self.get_non_database_instances()
+        self._create_database_monitors(instances, dbtype='mongodb',
+                                       alarm='yes', arbiter=1)
 
 
-class RedisSingleZabbixProvider(ZabbixProvider):
+class RedisZabbixProvider(ZabbixProvider):
+    def get_params_for_instance(self, instance, **kwargs):
+        monitor_type = kwargs['monitor_type']
+        del kwargs['monitor_type']
+
+        kwargs = {"address": instance.dns,
+                  "uri": "/health-check/{}/".format(monitor_type),
+                  "var": monitor_type,
+                  }
+        return kwargs
+
+
+class RedisSingleZabbixProvider(RedisZabbixProvider):
     def create_database_monitors(self,):
         instances = self.get_database_instances()
-        self._create_web_monitors(monitor_type=['redis-mem', 'redis-con'],
+        self._create_web_monitors(monitor_type='redis-con',
+                                  instances=instances, regexp='WORKING')
+
+        self._create_web_monitors(monitor_type='redis-mem',
                                   instances=instances, regexp='WORKING')
 
 
 class RedisHighAvailabilityZabbixProvider(ZabbixProvider):
     def create_database_monitors(self,):
         instances = self.get_database_instances()
+
         self._create_web_monitors(monitor_type=['redis-mem', 'redis-con'],
                                   instances=instances, regexp='WORKING')
 

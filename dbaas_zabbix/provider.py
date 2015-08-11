@@ -9,7 +9,7 @@ LOG = logging.getLogger(__name__)
 class ZabbixProvider(DatabaseAsAServiceApi):
 
     def __init__(self, user, password, endpoint, clientgroups, databaseinfra,
-                 api_class, alarm='yes'):
+                 api_class):
         super(ZabbixProvider, self).__init__(databaseinfra,)
 
         self.environment = self.get_environment()
@@ -17,14 +17,13 @@ class ZabbixProvider(DatabaseAsAServiceApi):
         self.api = api_class(endpoint)
         self.api.login(user=user, password=password)
         self.databaseinfra = databaseinfra
-        self.alarm = alarm
 
     def __create_basic_monitors(self, **kwargs):
         return self.api.globo.createBasicMonitors(**kwargs)
 
-    def __create_database_monitors(self, params):
-        LOG.info("Creating databse monitor with params: {}".format(params))
-        return self.api.globo.createDBMonitors(params=params)
+    def __create_database_monitors(self, **kwargs):
+        LOG.info("Creating databse monitor with params: {}".format(kwargs))
+        return self.api.globo.createDBMonitors(**kwargs)
 
     def __create_web_monitors(self, **kwargs):
         return self.api.globo.createWebMonitors(**kwargs)
@@ -32,7 +31,7 @@ class ZabbixProvider(DatabaseAsAServiceApi):
     def __delete_monitors(self, host):
         return self.api.globo.deleteMonitors(host)
 
-    def _create_basic_monitors(self, hosts):
+    def _create_basic_monitors(self, hosts, **kwargs):
         for host in hosts:
             LOG.info("Creating basic monitor for host: {}".format(host))
             self.__create_basic_monitors(host=host.hostname, ip=host.address,
@@ -59,19 +58,21 @@ class ZabbixProvider(DatabaseAsAServiceApi):
             params = self.get_params_for_instance(instance, **kwargs)
             self.__create_web_monitors(**params)
 
-    def create_basic_monitors(self,):
+    def create_basic_monitors(self, **kwargs):
         hosts = self.get_hosts()
-        self._create_basic_monitors(hosts)
+        self._create_basic_monitors(hosts, **kwargs)
 
     def delete_basic_monitors(self,):
         hosts = self.get_hosts()
         self._delete_basic_monitors(hosts)
 
     def get_params_for_instance(self, instance, **kwargs):
+        host = instance.dns
+        kwargs['host'] = host
+        return kwargs
+
+    def create_database_monitors(self, **kwargs):
         raise NotImplementedError
 
-    def create_database_monitors(self, ):
-        raise NotImplementedError
-
-    def delete_database_monitors(self, ):
+    def delete_database_monitors(self, **kwargs):
         raise NotImplementedError

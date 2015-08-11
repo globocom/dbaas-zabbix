@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import unittest
-from dbaas_zabbix import provider
 from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
 from tests import factory
 
@@ -15,7 +14,7 @@ class TestDatabaseAsAServiceApi(unittest.TestCase):
     def test_get_all_instances(self):
         instances = self.dbaas_api.get_all_instances()
         infra_instances = self.databaseinfra.instances.all()
-        self.assertEqual(instances, infra_instances)
+        self.assertListEqual(instances, infra_instances)
 
     def test_databaseinfra_driver(self):
         driver = self.dbaas_api.get_databaseinfra_driver()
@@ -23,7 +22,7 @@ class TestDatabaseAsAServiceApi(unittest.TestCase):
 
     def test_get_hosts(self):
         instances = self.databaseinfra.instances.all()
-        hosts = [instance.hostname for instance in instances]
+        hosts = list(set([instance.hostname for instance in instances]))
         self.assertEqual(hosts, self.dbaas_api.get_hosts())
 
     def tearDown(self):

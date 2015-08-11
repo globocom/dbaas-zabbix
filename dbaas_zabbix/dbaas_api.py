@@ -20,8 +20,8 @@ class DatabaseAsAServiceApi(object):
         return self.driver.get_non_database_instances()
 
     def get_hosts(self,):
-        instances = self.driver.get_database_instances()
-        return [instance.hostname for instance in instances]
+        instances = self.get_all_instances()
+        return list(set([instance.hostname for instance in instances]))
 
     def get_environment(self):
         return self.databaseinfra.environment
