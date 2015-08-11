@@ -6,7 +6,6 @@ from tests import factory
 
 
 class TestDatabaseAsAServiceApi(unittest.TestCase):
-
     def setUp(self):
         self.databaseinfra = factory.set_up_databaseinfra()
         self.dbaas_api = DatabaseAsAServiceApi(self.databaseinfra)
@@ -30,16 +29,16 @@ class TestDatabaseAsAServiceApi(unittest.TestCase):
 
 
 class TestZabbixApi(unittest.TestCase):
-
     def setUp(self):
         self.databaseinfra = factory.set_up_databaseinfra()
-        api_class = factory.FakeZabbixAPI
+        zabbix_api = factory.FakeZabbixAPI
+        dbaas_api = DatabaseAsAServiceApi(self.databaseinfra)
         self.zabbix_provider = factory.FakeZabbixProvider('fake_user',
                                                           'fake_pas@123',
                                                           'fake.endpoint.com',
                                                           [1, 2],
-                                                          self.databaseinfra,
-                                                          api_class)
+                                                          dbaas_api,
+                                                          zabbix_api)
 
     def test_create_basic_monitors(self):
         self.zabbix_provider.create_basic_monitors()

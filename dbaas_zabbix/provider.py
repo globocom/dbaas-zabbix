@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 import logging
 from dbaas_zabbix.custom_exceptions import NotImplementedError
-from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
 
 LOG = logging.getLogger(__name__)
 
 
-class ZabbixProvider(DatabaseAsAServiceApi):
-
-    def __init__(self, user, password, endpoint, clientgroups, databaseinfra,
-                 api_class):
-        super(ZabbixProvider, self).__init__(databaseinfra,)
-
-        self.environment = self.get_environment()
+class ZabbixProvider(object):
+    def __init__(self, user, password, endpoint, clientgroups, dbaas_api,
+                 zabbix_api):
+        self.dbaas_api = dbaas_api
         self.clientgroups = clientgroups
-        self.api = api_class(endpoint)
+        self.api = zabbix_api(endpoint)
         self.api.login(user=user, password=password)
-        self.databaseinfra = databaseinfra
+
+    def __getattr__(self, name):
+        if name.startswith('get_'):
+            return getattr(self.dbaas_api, name)
 
     def __create_basic_monitors(self, **kwargs):
         return self.api.globo.createBasicMonitors(**kwargs)
