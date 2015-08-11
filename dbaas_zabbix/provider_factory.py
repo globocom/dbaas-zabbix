@@ -25,7 +25,7 @@ class ProviderFactory(object):
 
 
 def get_available_providers():
-    available_objects = dir(sys.modules(database_providers.__name__))
+    available_objects = dir(database_providers)
     available_objects = filter(lambda klass: 'Provider' in klass,
                                available_objects)
 
