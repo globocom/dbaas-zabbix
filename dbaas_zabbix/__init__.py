@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from dbaas_api import DatabaseAsAServiceApi
+from provider_factory import ProviderFactory
 
-__author__ = 'Felippe Raposo'
-__email__ = 'raposo.felippe@gmail.com'
-__version__ = '0.0.1'
+
+def factory_for(**kwargs):
+    databaseinfra = kwargs['databaseinfra']
+    del kwargs['databaseinfra']
+
+    dbaas_api = DatabaseAsAServiceApi(databaseinfra)
+
+    return ProviderFactory(dbaas_api, **kwargs)
