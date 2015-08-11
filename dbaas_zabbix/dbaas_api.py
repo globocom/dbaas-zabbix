@@ -31,3 +31,6 @@ class DatabaseAsAServiceApi(object):
 
     def get_databaseinfra_secondary_ips(self):
         return self.databaseinfra.cs_dbinfra_attributes.all()
+
+    def get_databaseinfra_availability(self):
+        return self.databaseinfra.plan.is_ha
