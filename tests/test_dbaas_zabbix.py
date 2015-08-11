@@ -42,7 +42,7 @@ class TestZabbixApi(unittest.TestCase):
                                                        factory.FakeZabbixAPI)
 
     def test_create_basic_monitors(self):
-        self.zabbix_provider._create_basic_monitors()
+        self.zabbix_provider.create_basic_monitors()
         last_calls = self.zabbix_provider.api.last_call
         self.assert_create_basic_monitor_call(last_calls)
 
@@ -50,7 +50,7 @@ class TestZabbixApi(unittest.TestCase):
         method = 'globo.createBasicMonitors'
         hosts = self.zabbix_provider.get_hosts()
         for index, call in enumerate(last_calls):
-            params = call.get('params')[0]
+            params = call.get('params')
             host = hosts[index]
 
             ip = params.get('ip')
@@ -64,7 +64,7 @@ class TestZabbixApi(unittest.TestCase):
             self.assertEqual(method_called, method)
 
     def test_delete_monitors(self):
-        self.zabbix_provider._delete_basic_monitors()
+        self.zabbix_provider.delete_basic_monitors()
         last_calls = self.zabbix_provider.api.last_call
         self.assert_delete_monitors(last_calls)
 
@@ -72,10 +72,9 @@ class TestZabbixApi(unittest.TestCase):
         method = 'globo.deleteMonitors'
         hosts = self.zabbix_provider.get_hosts()
         for index, call in enumerate(last_calls):
-            params = call.get('params')[0]
             host = hosts[index]
 
-            hostname = params.get('host')
+            hostname = call.get('params')[0]
             method_called = call.get('method')
 
             self.assertEqual(hostname, host.hostname)
@@ -91,30 +90,34 @@ class TestZabbixApi(unittest.TestCase):
         method = 'globo.deleteMonitors'
         instances = self.zabbix_provider.get_all_instances()
         for index, call in enumerate(last_calls):
-            params = call.get('params')[0]
             instance = instances[index]
 
-            dns = params.get('host')
+            dns = call.get('params')[0]
             method_called = call.get('method')
 
             self.assertEqual(dns, instance.dns)
             self.assertEqual(method_called, method)
 
     def test_create_web_monitors(self):
-        method = 'globo.createWebMonitors'
-        instance = self.zabbix_provider.get_all_instances()[0]
+        instances = self.zabbix_provider.get_all_instances()
         dbinfra_name = self.zabbix_provider.get_databaseifra_name()
-        params = {"address": instance.dns, "port": "80", "regexp": "WORKING",
+        params = {"port": "80", "regexp": "WORKING",
                   "uri": "/health-check/redis-con/", "var": "redis-con",
                   "alarm": "yes", "notes": dbinfra_name,
                   "clientgroup": [1, 2]}
 
-        self.zabbix_provider._ZabbixProvider__create_web_monitors(params)
-        last_call = self.zabbix_provider.api.last_call[0]
-        last_call_params = last_call['params']['params']
+        self.zabbix_provider._create_web_monitors(instances, **params)
+        self.asset_create_web_monitors(instances, params)
 
-        self.assertEqual(last_call['method'], method)
-        self.assertEqual(params, last_call_params)
+    def asset_create_web_monitors(self, instances, params):
+        method = 'globo.createWebMonitors'
+        for index, instance in enumerate(instances):
+            last_call = self.zabbix_provider.api.last_call[index]
+            last_call_params = last_call['params']
+            params['address'] = instance.dns
+
+            self.assertEqual(last_call['method'], method)
+            self.assertEqual(params, last_call_params)
 
     def tearDown(self):
         pass
