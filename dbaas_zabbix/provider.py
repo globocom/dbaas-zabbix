@@ -9,12 +9,12 @@ class ZabbixProvider(object):
     __provider_name__ = None
     __is_ha__ = None
 
-    def __init__(self, user, password, endpoint, clientgroups, dbaas_api,
-                 zabbix_api):
+    def __init__(self, dbaas_api, zabbix_api):
         self.dbaas_api = dbaas_api
-        self.clientgroups = clientgroups
-        self.api = zabbix_api(endpoint)
-        self.api.login(user=user, password=password)
+        self.clientgroup = dbaas_api.get_credential_clientgroup()
+        self.api = zabbix_api(dbaas_api.get_credential_endpoint())
+        self.api.login(user=dbaas_api.get_credential_user(),
+                       password=dbaas_api.get_credential_password())
 
     def __getattr__(self, name):
         if name.startswith('get_'):
@@ -37,7 +37,7 @@ class ZabbixProvider(object):
         for host in hosts:
             LOG.info("Creating basic monitor for host: {}".format(host))
             self.__create_basic_monitors(host=host.hostname, ip=host.address,
-                                         clientgroup=self.clientgroups)
+                                         clientgroup=self.clientgroup)
 
     def _delete_basic_monitors(self, hosts):
         for host in hosts:
