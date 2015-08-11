@@ -44,7 +44,8 @@ class MySQLHighAvailabilityZabbixProvider(ZabbixProvider):
 
 class MongoDBSingleZabbixProvider(ZabbixProvider):
     def create_database_monitors(self, alarm='yes'):
-        self._create_database_monitors(dbtype='mongodb', alarm=alarm)
+        instances = self.get_all_instances()
+        self._create_database_monitors(instances, dbtype='mongodb', alarm=alarm)
 
 
 class MongoDBHighAvailabilityZabbixProvider(ZabbixProvider):
