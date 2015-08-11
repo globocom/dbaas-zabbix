@@ -54,7 +54,15 @@ release_globo:
 	python setup.py sdist upload -r ipypiglobo
 
 fake_deploy:
-	rm /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/provider.pyc
+	rm -f /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/__init__.pyc
+	rm -f /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/custom_exceptions.pyc
+	rm -f /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/database_providers.pyc
+	rm -f /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/dbaas_api.pyc
+	rm -f /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/provider.pyc
+	cp dbaas_zabbix/__init__.py /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/
+	cp dbaas_zabbix/custom_exceptions.py /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/
+	cp dbaas_zabbix/database_providers.py /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/
+	cp dbaas_zabbix/dbaas_api.py /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/
 	cp dbaas_zabbix/provider.py /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/
 
 dist: clean
