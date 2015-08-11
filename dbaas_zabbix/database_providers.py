@@ -65,6 +65,7 @@ class RedisZabbixProvider(ZabbixProvider):
         kwargs = {"address": instance.dns,
                   "uri": "/health-check/{}/".format(monitor_type),
                   "var": monitor_type,
+                  "notes": self.get_databaseifra_name()
                   }
         return kwargs
 
