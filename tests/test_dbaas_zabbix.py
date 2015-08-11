@@ -34,12 +34,13 @@ class TestZabbixApi(unittest.TestCase):
 
     def setUp(self):
         self.databaseinfra = factory.set_up_databaseinfra()
-        self.zabbix_provider = provider.ZabbixProvider('fake_user',
-                                                       'fake_pas@123',
-                                                       'fake.endpoint.com',
-                                                       [1, 2],
-                                                       self.databaseinfra,
-                                                       factory.FakeZabbixAPI)
+        api_class = factory.FakeZabbixAPI
+        self.zabbix_provider = factory.FakeZabbixProvider('fake_user',
+                                                          'fake_pas@123',
+                                                          'fake.endpoint.com',
+                                                          [1, 2],
+                                                          self.databaseinfra,
+                                                          api_class)
 
     def test_create_basic_monitors(self):
         self.zabbix_provider.create_basic_monitors()

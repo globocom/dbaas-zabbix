@@ -1,4 +1,4 @@
-
+from dbaas_zabbix.provider import ZabbixProvider
 
 class Host(object):
     def __init__(self, address, dns):
@@ -93,3 +93,9 @@ class FakeZabbixAPIObjectClass(object):
                 args or kwargs
             )
         return fn
+
+
+class FakeZabbixProvider(ZabbixProvider):
+    def get_params_for_instance(self, instance, **kwargs):
+        kwargs['address'] = instance.dns
+        return kwargs

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 from dbaas_zabbix.custom_exceptions import NotImplementedError
-from dbaas_api import DatabaseAsAServiceApi
+from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
 
 LOG = logging.getLogger(__name__)
 
@@ -51,11 +51,13 @@ class ZabbixProvider(DatabaseAsAServiceApi):
 
     def _create_database_monitors(self, instances, **kwargs):
         for instance in instances:
-            self.__create_database_monitors(host=instance.dns, **kwargs)
+            params = self.get_params_for_instance(instance, **kwargs)
+            self.__create_database_monitors(**params)
 
     def _create_web_monitors(self, instances, **kwargs):
         for instance in instances:
-            self.__create_web_monitors(address=instance.dns, **kwargs)
+            params = self.get_params_for_instance(instance, **kwargs)
+            self.__create_web_monitors(**params)
 
     def create_basic_monitors(self,):
         hosts = self.get_hosts()
@@ -64,6 +66,9 @@ class ZabbixProvider(DatabaseAsAServiceApi):
     def delete_basic_monitors(self,):
         hosts = self.get_hosts()
         self._delete_basic_monitors(hosts)
+
+    def get_params_for_instance(self, instance, **kwargs):
+        raise NotImplementedError
 
     def create_database_monitors(self, ):
         raise NotImplementedError
