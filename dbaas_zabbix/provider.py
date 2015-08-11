@@ -1,41 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 from dbaas_zabbix.custom_exceptions import NotImplementedError
+from dbaas_api import DatabaseAsAServiceApi
 from itertools import product
 
 LOG = logging.getLogger(__name__)
-
-
-class DatabaseAsAServiceApi(object):
-    def __init__(self, databaseinfra):
-        self.databaseinfra = databaseinfra
-        self.driver = self.get_databaseinfra_driver()
-        self.database_instances = self.get_database_instances()
-
-    def get_all_instances(self, ):
-        return self.databaseinfra.instances.all()
-
-    def get_databaseinfra_driver(self):
-        return self.databaseinfra.get_driver()
-
-    def get_database_instances(self):
-        return self.driver.get_database_instances()
-
-    def get_non_database_instances(self,):
-        return self.driver.get_non_database_instances()
-
-    def get_hosts(self,):
-        instances = self.driver.get_database_instances()
-        return [instance.hostname for instance in instances]
-
-    def get_environment(self):
-        return self.databaseinfra.environment
-
-    def get_databaseifra_name(self):
-        return self.databaseinfra.name
-
-    def get_databaseinfra_secondary_ips(self):
-        return self.databaseinfra.cs_dbinfra_attributes.all()
 
 
 class ZabbixProvider(DatabaseAsAServiceApi):
@@ -111,15 +80,3 @@ class ZabbixProvider(DatabaseAsAServiceApi):
 
     def delete_database_monitors(self, ):
         raise NotImplementedError
-
-    @classmethod
-    def create_monitoring(cls, ):
-        zabbix_provider = cls()
-        zabbix_provider._create_basic_monitors()
-        zabbix_provider.create_database_monitors()
-
-    @classmethod
-    def delete_monitoring(cls):
-        zabbix_provider = cls()
-        zabbix_provider._delete_basic_monitors()
-        zabbix_provider.delete_database_monitors()

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 from dbaas_zabbix import provider
+from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
 from tests import factory
 
 
@@ -9,7 +10,7 @@ class TestDatabaseAsAServiceApi(unittest.TestCase):
 
     def setUp(self):
         self.databaseinfra = factory.set_up_databaseinfra()
-        self.dbaas_api = provider.DatabaseAsAServiceApi(self.databaseinfra)
+        self.dbaas_api = DatabaseAsAServiceApi(self.databaseinfra)
 
     def test_get_all_instances(self):
         instances = self.dbaas_api.get_all_instances()
