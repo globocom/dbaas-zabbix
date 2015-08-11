@@ -7,7 +7,8 @@ LOG = logging.getLogger(__name__)
 
 class MySQLSingleZabbixProvider(ZabbixProvider):
     def create_database_monitors(self,):
-        self._create_database_monitors(dbtype='mysql', alarm='no')
+        instances = self.get_all_instances()
+        self._create_database_monitors(instances, dbtype='mysql', alarm='no')
 
 
 class MySQLHighAvailabilityZabbixProvider(ZabbixProvider):
