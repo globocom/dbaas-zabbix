@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from provider import ZabbixProvider
+from dbaas_zabbix.provider import ZabbixProvider
 import logging
 
 LOG = logging.getLogger(__name__)
