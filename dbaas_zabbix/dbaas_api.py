@@ -34,3 +34,6 @@ class DatabaseAsAServiceApi(object):
 
     def get_databaseinfra_availability(self):
         return self.databaseinfra.plan.is_ha
+
+    def get_databaseinfra_engine_name(self):
+        return self.databaseinfra.engine.engine_type.name
