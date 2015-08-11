@@ -16,7 +16,7 @@ class MySQLHighAvailabilityZabbixProvider(ZabbixProvider):
         host = instance.dns
         kwargs['host'] = host
 
-        if kwargs.get('healthcheck', d=None):
+        if kwargs.get('healthcheck'):
             kwargs['healthcheck']['host'] = host
             kwargs['healthcheck_monitor']['host'] = host
 
