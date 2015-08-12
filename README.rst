@@ -8,16 +8,16 @@ dbaas-zabbix
 .. image:: https://travis-ci.org/globocom/dbaas-zabbix.svg?branch=master
     :target: https://travis-ci.org/globocom/dbaas-zabbix
 
-.. image:: https://pypip.in/d/dbaas-zabbix/badge.png
-    :target: https://pypi.python.org/pypi/dbaas-zabbix
-
 
 A Zabbix Integration for DBaaS.
 
 * Free software: BSD license
-* Documentation: http://dbaas-zabbix.rtfd.org.
+
+Documentation
+-------------
+* TODO
 
 Features
 --------
 
-* TODO
+This package provides a simple interface to zabbix and is used by dbaas to provide monitoring for it's databases.
