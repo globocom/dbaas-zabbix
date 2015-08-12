@@ -118,11 +118,14 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
 
     def delete_database_monitors(self,):
         for instance in self.get_database_instances():
-            self._delete_monitors(host="webmonitor_{}-80-redis-con".format(instance.dns))
-            self._delete_monitors(host="webmonitor_{}-80-redis-mem".format(instance.dns))
+            host = "webmonitor_{}-80-redis-con".format(instance.dns)
+            self._delete_monitors(host=host)
+            host = "webmonitor_{}-80-redis-mem".format(instance.dns)
+            self._delete_monitors(host=host)
 
         for instance in self.get_non_database_instances():
-            self._delete_monitors(host="webmonitor_{}-80-sentinel-con".format(instance.dns))
+            host = "webmonitor_{}-80-sentinel-con".format(instance.dns)
+            self._delete_monitors(host=host)
 
 
 class RedisSingleZabbixProvider(RedisZabbixProvider):
