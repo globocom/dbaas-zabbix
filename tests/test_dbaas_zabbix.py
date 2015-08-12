@@ -2,13 +2,16 @@
 # -*- coding: utf-8 -*-
 import unittest
 from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
+from dbaas_zabbix import provider_factory
+from dbaas_zabbix import database_providers
 from tests import factory
 
 
 class TestDatabaseAsAServiceApi(unittest.TestCase):
     def setUp(self):
         self.databaseinfra = factory.set_up_databaseinfra()
-        self.dbaas_api = DatabaseAsAServiceApi(self.databaseinfra, factory.FakeCredential())
+        self.dbaas_api = DatabaseAsAServiceApi(self.databaseinfra,
+                                               factory.FakeCredential())
 
     def test_get_all_instances(self):
         instances = self.dbaas_api.get_all_instances()
@@ -32,7 +35,8 @@ class TestZabbixApi(unittest.TestCase):
     def setUp(self):
         self.databaseinfra = factory.set_up_databaseinfra()
         zabbix_api = factory.FakeZabbixAPI
-        dbaas_api = DatabaseAsAServiceApi(self.databaseinfra, factory.FakeCredential())
+        dbaas_api = DatabaseAsAServiceApi(self.databaseinfra,
+                                          factory.FakeCredential())
         self.zabbix_provider = factory.FakeZabbixProvider(dbaas_api,
                                                           zabbix_api)
 
@@ -113,6 +117,61 @@ class TestZabbixApi(unittest.TestCase):
 
             self.assertEqual(last_call['method'], method)
             self.assertEqual(params, last_call_params)
+
+    def tearDown(self):
+        pass
+
+
+class TestProviderFactory(unittest.TestCase):
+    def setUp(self):
+        self.available_providers = provider_factory.get_available_providers()
+        self.provider_name = 'fake'
+        databaseinfra = factory.set_up_databaseinfra()
+        self.credential = factory.FakeCredential()
+        self.dbaas_api = DatabaseAsAServiceApi(databaseinfra,
+                                               self.credential)
+        self.zabbix_api = factory.FakeZabbixAPI
+
+    def test_get_available_providers(self):
+        for provider in self.available_providers:
+            provider_name = provider.__name__
+            provider_class = database_providers.__getattribute__(provider_name)
+            self.assertEquals(provider, provider_class)
+
+    def test_provider_factory_get_provider_class_single(self):
+        provider_class = database_providers.FakeSingleZabbixProvider
+        self.assert_provider_factory_get_provider_class(False,
+                                                        provider_class)
+
+    def test_provider_factory_get_provider_class_ha(self):
+        provider_class = database_providers.FakeHAZabbixProvider
+        self.assert_provider_factory_get_provider_class(True,
+                                                        provider_class)
+
+    def assert_provider_factory_get_provider_class(self, is_ha,
+                                                   provider_class):
+        provider = provider_factory.ProviderFactory.get_provider_class('fake',
+                                                                       is_ha)
+        self.assertEqual(provider, provider_class)
+
+    def test_provider_factory_single_instance(self):
+        databaseinfra = factory.set_up_databaseinfra(is_ha=False)
+        provider_class = database_providers.FakeSingleZabbixProvider
+
+        self.assert_provider_factory(databaseinfra, provider_class)
+
+    def assert_provider_factory(self, databaseinfra, provider_class):
+        dbaas_api = DatabaseAsAServiceApi(databaseinfra, self.credential)
+        provider = provider_factory.ProviderFactory.factory(dbaas_api,
+                                                            zabbix_api=self.zabbix_api)
+
+        self.assertIsInstance(provider, provider_class)
+
+    def test_provider_factory_ha(self):
+        databaseinfra = factory.set_up_databaseinfra(is_ha=True)
+        provider_class = database_providers.FakeHAZabbixProvider
+
+        self.assert_provider_factory(databaseinfra, provider_class)
 
     def tearDown(self):
         pass

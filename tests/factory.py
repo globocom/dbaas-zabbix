@@ -7,6 +7,21 @@ class Host(object):
         self.hostname = dns
 
 
+class Engine(object):
+    def __init__(self, name):
+        self.engine_type = EngineType(name)
+
+
+class EngineType(object):
+    def __init__(self, name):
+        self.name = name
+
+
+class Plan(object):
+    def __init__(self, is_ha):
+        self.is_ha = is_ha
+
+
 class Instance(object):
     def __init__(self, dns, hostname):
         self.address = hostname.address
@@ -26,10 +41,12 @@ class Driver(object):
 
 
 class DatabaseInfra(object):
-    def __init__(self, instances, environment):
+    def __init__(self, instances, environment, plan):
         self.instances = instances
         self.environment = environment
-        self.name = "fakeinfra"
+        self.name = "fake"
+        self.engine = Engine('fake')
+        self.plan = plan
 
     def get_driver(self):
         if hasattr(self, 'driver'):
@@ -44,8 +61,9 @@ class InstanceList(list):
         return self
 
 
-def set_up_databaseinfra():
+def set_up_databaseinfra(is_ha=True):
     instances = InstanceList()
+    plan = Plan(is_ha)
     for n in range(1, 4):
         address = '10.10.10.1{}'.format(n)
         dns = 'myhost_{}'.format(n)
@@ -54,7 +72,7 @@ def set_up_databaseinfra():
         instance = Instance(dns + '.database.com', host)
         instances.append(instance)
 
-    return DatabaseInfra(instances, 'development')
+    return DatabaseInfra(instances, 'development', plan)
 
 
 class FakeZabbixAPI(object):

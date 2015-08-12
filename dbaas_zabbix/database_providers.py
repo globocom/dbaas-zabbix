@@ -119,3 +119,21 @@ class RedisHighAvailabilityZabbixProvider(RedisZabbixProvider):
         self._create_web_monitors(instances=instances, regexp='WORKING',
                                   monitor_type='sentinel-con', alarm=alarm
                                   )
+
+
+class FakeSingleZabbixProvider(ZabbixProvider):
+    __provider_name__ = 'fake'
+    __is_ha__ = False
+
+    def create_database_monitors(self, alarm='yes'):
+        instances = self.get_all_instances()
+        self._create_database_monitors(instances, dbtype='fake', alarm=alarm)
+
+
+class FakeHAZabbixProvider(ZabbixProvider):
+    __provider_name__ = 'fake'
+    __is_ha__ = True
+
+    def create_database_monitors(self, alarm='yes'):
+        instances = self.get_all_instances()
+        self._create_database_monitors(instances, dbtype='fake', alarm=alarm)
