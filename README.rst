@@ -2,7 +2,7 @@
 dbaas-zabbix
 ===============================
 
-.. image:: https://badge.fury.io/py/dbaas-zabbix.png
+.. image:: https://badge.fury.io/py/dbaas-zabbix.svg
     :target: http://badge.fury.io/py/dbaas-zabbix
     
 .. image:: https://travis-ci.org/globocom/dbaas-zabbix.svg?branch=master
