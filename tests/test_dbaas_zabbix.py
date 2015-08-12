@@ -37,8 +37,7 @@ class TestZabbixApi(unittest.TestCase):
         zabbix_api = factory.FakeZabbixAPI
         dbaas_api = DatabaseAsAServiceApi(self.databaseinfra,
                                           factory.FakeCredential())
-        self.zabbix_provider = factory.FakeZabbixProvider(dbaas_api,
-                                                          zabbix_api)
+        self.zabbix_provider = factory.FakeDatabaseZabbixProvider(dbaas_api, zabbix_api)
 
     def test_create_basic_monitors(self):
         self.zabbix_provider.create_basic_monitors()
@@ -80,8 +79,7 @@ class TestZabbixApi(unittest.TestCase):
             self.assertEqual(method_called, method)
 
     def test_delete_database_monitors(self):
-        instances = self.zabbix_provider.get_all_instances()
-        self.zabbix_provider._delete_database_monitors(instances)
+        self.zabbix_provider.delete_database_monitors()
         last_calls = self.zabbix_provider.api.last_call
         self.assert_delete_database_monitors(last_calls)
 
@@ -99,13 +97,15 @@ class TestZabbixApi(unittest.TestCase):
 
     def test_create_web_monitors(self):
         instances = self.zabbix_provider.get_all_instances()
-        dbinfra_name = self.zabbix_provider.get_databaseifra_name()
-        params = {"port": "80", "regexp": "WORKING",
-                  "uri": "/health-check/redis-con/", "var": "redis-con",
-                  "alarm": "yes", "notes": dbinfra_name,
-                  "clientgroup": [1, 2]}
+        for instance in instances:
+            dbinfra_name = self.zabbix_provider.get_databaseifra_name()
+            params = {"address": instance.dns,
+                      "port": "80", "regexp": "WORKING",
+                      "uri": "/health-check/redis-con/", "var": "redis-con",
+                      "alarm": "yes", "notes": dbinfra_name,
+                      "clientgroup": [1, 2]}
 
-        self.zabbix_provider._create_web_monitors(instances, **params)
+            self.zabbix_provider._create_web_monitors(**params)
         self.asset_create_web_monitors(instances, params)
 
     def asset_create_web_monitors(self, instances, params):

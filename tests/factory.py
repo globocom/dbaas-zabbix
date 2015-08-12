@@ -1,4 +1,4 @@
-from dbaas_zabbix.provider import ZabbixProvider
+from dbaas_zabbix.database_providers import DatabaseZabbixProvider
 
 
 class Host(object):
@@ -114,10 +114,9 @@ class FakeZabbixAPIObjectClass(object):
         return fn
 
 
-class FakeZabbixProvider(ZabbixProvider):
-    def get_params_for_instance(self, instance, **kwargs):
-        kwargs['address'] = instance.dns
-        return kwargs
+class FakeDatabaseZabbixProvider(DatabaseZabbixProvider):
+    def get_databaseinfra_secondary_ips(self,):
+        return []
 
 
 class FakeCredential(object):
