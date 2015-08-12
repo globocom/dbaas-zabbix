@@ -11,7 +11,9 @@ class DatabaseZabbixProvider(ZabbixProvider):
         for host in self.get_hosts():
             self._create_basic_monitors(host=host.hostname,
                                         ip=host.address,
-                                        clientgroup=self.clientgroup)
+                                        clientgroup=self.clientgroup,
+                                        alarm="group"
+                                        )
 
     def delete_basic_monitors(self, ):
         for host in self.get_hosts():
@@ -36,7 +38,7 @@ class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
         for instance in self.get_all_instances():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mysql',
-                                           alarm='no')
+                                           alarm='group')
 
 
 class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
@@ -67,22 +69,22 @@ class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = False
 
-    def create_database_monitors(self, alarm='yes'):
+    def create_database_monitors(self):
         for instance in self.get_all_instances():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mongodb',
-                                           alarm=alarm)
+                                           alarm="group")
 
 
 class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = True
 
-    def create_database_monitors(self, alarm='yes'):
+    def create_database_monitors(self,):
         for instance in self.get_database_instances():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mongodb',
-                                           alarm=alarm)
+                                           alarm="yes")
 
         for instance in self.get_non_database_instances():
             self._create_database_monitors(host=instance.dns,
@@ -93,11 +95,16 @@ class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
 
 class RedisZabbixProvider(DatabaseZabbixProvider):
 
-    def create_database_monitors(self, alarm='yes'):
+    def create_database_monitors(self,):
+
+        if self.__is_ha__:
+            alarm = "yes"
+        else:
+            alarm = "group"
         params = {
             "notes": self.get_databaseifra_name(),
             "regexp": "WORKING",
-            "alarm": "yes",
+            "alarm": alarm,
             "clientgroup": self.clientgroup,
         }
         for instance in self.get_database_instances():
@@ -142,7 +149,7 @@ class FakeSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'fake'
     __is_ha__ = False
 
-    def create_database_monitors(self, alarm='yes'):
+    def create_database_monitors(self, alarm='group'):
         instances = self.get_all_instances()
         self._create_database_monitors(instances, dbtype='fake', alarm=alarm)
 
@@ -151,6 +158,6 @@ class FakeHAZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'fake'
     __is_ha__ = True
 
-    def create_database_monitors(self, alarm='yes'):
+    def create_database_monitors(self, alarm='group'):
         instances = self.get_all_instances()
         self._create_database_monitors(instances, dbtype='fake', alarm=alarm)
