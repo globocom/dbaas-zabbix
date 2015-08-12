@@ -8,6 +8,8 @@ dbaas-zabbix
 .. image:: https://travis-ci.org/globocom/dbaas-zabbix.svg?branch=master
     :target: https://travis-ci.org/globocom/dbaas-zabbix
 
+.. image:: https://coveralls.io/repos/globocom/dbaas-zabbix/badge.svg?branch=master&service=github :target: https://coveralls.io/github/globocom/dbaas-zabbix?branch=master
+
 
 A Zabbix Integration for DBaaS.
 
