@@ -6,7 +6,7 @@ dbaas-zabbix
     :target: http://badge.fury.io/py/dbaas-zabbix
     
 .. image:: https://travis-ci.org/felippemr/dbaas-zabbix.png?branch=master
-        :target: https://travis-ci.org/felippemr/dbaas-zabbix
+        :target: https://travis-ci.org/globocom/dbaas-zabbix
 
 .. image:: https://pypip.in/d/dbaas-zabbix/badge.png
         :target: https://pypi.python.org/pypi/dbaas-zabbix
