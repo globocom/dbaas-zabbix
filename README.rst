@@ -6,10 +6,10 @@ dbaas-zabbix
     :target: http://badge.fury.io/py/dbaas-zabbix
     
 .. image:: https://travis-ci.org/globocom/dbaas-zabbix.svg?branch=master
-        :target: https://travis-ci.org/globocom/dbaas-zabbix
+    :target: https://travis-ci.org/globocom/dbaas-zabbix
 
 .. image:: https://pypip.in/d/dbaas-zabbix/badge.png
-        :target: https://pypi.python.org/pypi/dbaas-zabbix
+    :target: https://pypi.python.org/pypi/dbaas-zabbix
 
 
 A Zabbix Integration for DBaaS.
