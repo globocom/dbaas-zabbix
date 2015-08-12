@@ -14,4 +14,6 @@ install:
   - "pip install -r requirements_test.txt"
 
 # command to run tests, e.g. python setup.py test
-script: make test
+script: make coverage
+
+after_success: coveralls
