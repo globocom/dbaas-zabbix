@@ -11,6 +11,11 @@ def factory_for(**kwargs):
     del kwargs['databaseinfra']
     del kwargs['credentials']
 
+    zabbix_api = ZabbixAPI
+    if kwargs.get('zabbix_api'):
+        zabbix_api = kwargs.get('zabbix_api')
+        del kwargs['zabbix_api']
+
     dbaas_api = DatabaseAsAServiceApi(databaseinfra, credentials)
 
-    return ProviderFactory(dbaas_api, zabbix_api=ZabbixAPI, **kwargs)
+    return ProviderFactory.factory(dbaas_api, zabbix_api=zabbix_api, **kwargs)

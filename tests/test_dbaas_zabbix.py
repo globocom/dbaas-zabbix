@@ -4,6 +4,7 @@ import unittest
 from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
 from dbaas_zabbix import provider_factory
 from dbaas_zabbix import database_providers
+from dbaas_zabbix import factory_for
 from tests import factory
 
 
@@ -172,6 +173,15 @@ class TestProviderFactory(unittest.TestCase):
         provider_class = database_providers.FakeHAZabbixProvider
 
         self.assert_provider_factory(databaseinfra, provider_class)
+
+    def test_factory_for(self):
+        databaseinfra = factory.set_up_databaseinfra(is_ha=False)
+        provider = factory_for(databaseinfra=databaseinfra,
+                               credentials=self.credential,
+                               zabbix_api=self.zabbix_api)
+
+        self.assertIsInstance(provider,
+                              database_providers.FakeSingleZabbixProvider)
 
     def tearDown(self):
         pass
