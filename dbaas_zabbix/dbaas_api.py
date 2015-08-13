@@ -16,11 +16,11 @@ class DatabaseAsAServiceApi(object):
     def get_credential_endpoint(self):
         return self.credentials.endpoint
 
-    def get_credential_clientgroup(self):
-        return self.credentials.get_parameter_by_name("clientgroup")
+    def get_credential_main_clientgroup(self):
+        return self.credentials.get_parameter_by_name("main_clientgroup")
 
-    def get_credential_database_clientgroup(self):
-        return self.credentials.get_parameter_by_name("database_clientgroup")
+    def get_credential_extra_clientgroup(self):
+        return self.credentials.get_parameter_by_name("extra_clientgroup")
 
     def get_all_instances(self):
         return self.databaseinfra.instances.all()

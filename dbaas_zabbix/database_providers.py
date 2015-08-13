@@ -10,16 +10,16 @@ class DatabaseZabbixProvider(ZabbixProvider):
 
     def __init__(self, dbaas_api, zabbix_api):
         super(DatabaseZabbixProvider, self).__init__(dbaas_api, zabbix_api)
-        self.clientgroup = self.get_credential_clientgroup()
-        self.database_clientgroup = self.get_credential_database_clientgroup()
+        self.main_clientgroup = self.get_credential_main_clientgroup()
+        self.extra_clientgroup = self.get_credential_extra_clientgroup()
 
     def create_basic_monitors(self, ):
+        clientgroup = self.main_clientgroup
         for host in self.get_hosts():
             self._create_basic_monitors(host=host.hostname,
                                         ip=host.address,
-                                        clientgroup=self.clientgroup,
-                                        alarm="group"
-                                        )
+                                        clientgroup=clientgroup,
+                                        alarm="group")
 
     def delete_basic_monitors(self, ):
         for host in self.get_hosts():
@@ -41,7 +41,7 @@ class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
     __is_ha__ = False
 
     def create_database_monitors(self,):
-        clientgroup = self.database_clientgroup
+        clientgroup = self.extra_clientgroup
         for instance in self.get_all_instances():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mysql',
@@ -54,7 +54,7 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __is_ha__ = True
 
     def create_database_monitors(self,):
-        clientgroup = self.database_clientgroup
+        clientgroup = self.extra_clientgroup
         for instance in self.get_database_instances():
             params = {'host': instance.dns,
                       'alarm': 'group',
@@ -81,7 +81,7 @@ class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
     __is_ha__ = False
 
     def create_database_monitors(self):
-        clientgroup = self.database_clientgroup
+        clientgroup = self.extra_clientgroup
         for instance in self.get_all_instances():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mongodb',
@@ -94,7 +94,7 @@ class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __is_ha__ = True
 
     def create_database_monitors(self,):
-        clientgroup = self.database_clientgroup
+        clientgroup = self.extra_clientgroup
         for instance in self.get_database_instances():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mongodb',
@@ -113,10 +113,10 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
 
     def create_database_monitors(self,):
         clientgroup = []
-        if self.clientgroup:
-            clientgroup.append(self.clientgroup)
-        if self.database_clientgroup:
-            clientgroup.append(self.database_clientgroup)
+        if self.main_clientgroup:
+            clientgroup.append(self.main_clientgroup)
+        if self.extra_clientgroup:
+            clientgroup.append(self.extra_clientgroup)
 
         params = {
             "notes": self.get_databaseifra_name(),
