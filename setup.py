@@ -19,7 +19,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='dbaas_zabbix',
-    version='0.2.2',
+    version='0.2.3',
     description='A Zabbix Integration for DBaaS.',
     long_description=readme + '\n\n' + history,
     author='Felippe Raposo',
@@ -33,6 +33,7 @@ setup(
                  'dbaas_zabbix'},
     include_package_data=True,
     install_requires=[
+        'pyzabbix'
     ],
     license="BSD",
     zip_safe=False,
