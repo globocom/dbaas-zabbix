@@ -38,9 +38,6 @@ class DatabaseAsAServiceApi(object):
         instances = self.get_all_instances()
         return list(set([instance.hostname for instance in instances]))
 
-    def get_environment(self):
-        return self.databaseinfra.environment
-
     def get_databaseifra_name(self):
         return self.databaseinfra.name
 
