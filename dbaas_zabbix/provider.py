@@ -38,6 +38,9 @@ class ZabbixProvider(object):
     def get_host_info(self, **kwargs):
         return self.api.host.get(**kwargs)
 
+    def get_host_group_info(self, **kwargs):
+        return self.api.hostgroup.get(**kwargs)
+
     def create_basic_monitors(self, **kwargs):
         raise NotImplementedError
 
