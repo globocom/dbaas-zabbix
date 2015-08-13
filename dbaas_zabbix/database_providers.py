@@ -7,6 +7,12 @@ LOG = logging.getLogger(__name__)
 
 
 class DatabaseZabbixProvider(ZabbixProvider):
+
+    def __init__(self, dbaas_api, zabbix_api):
+        super(DatabaseZabbixProvider, self).__init__(dbaas_api, zabbix_api)
+        self.clientgroup = self.get_credential_clientgroup()
+        self.database_clientgroup = self.get_credential_database_clientgroup()
+
     def create_basic_monitors(self, ):
         for host in self.get_hosts():
             self._create_basic_monitors(host=host.hostname,
@@ -38,7 +44,8 @@ class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
         for instance in self.get_all_instances():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mysql',
-                                           alarm='group')
+                                           alarm='group',
+                                           clientgroup=self.database_clientgroup)
 
 
 class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
@@ -48,7 +55,8 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     def create_database_monitors(self,):
         for instance in self.get_database_instances():
             params = {'host': instance.dns,
-                      'alarm': 'yes',
+                      'alarm': 'group',
+                      'clientgroup': self.database_clientgroup,
                       'dbtype': 'mysql',
                       'healthcheck': {'port': '80',
                                       'string': 'WORKING',
@@ -62,7 +70,8 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
         for instance in self.get_databaseinfra_secondary_ips():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mysql',
-                                           alarm='yes')
+                                           alarm='group',
+                                           clientgroup=self.database_clientgroup)
 
 
 class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
@@ -73,7 +82,8 @@ class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
         for instance in self.get_all_instances():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mongodb',
-                                           alarm="group")
+                                           alarm="group",
+                                           clientgroup=self.database_clientgroup)
 
 
 class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
@@ -84,28 +94,31 @@ class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
         for instance in self.get_database_instances():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mongodb',
-                                           alarm="yes")
+                                           alarm="group",
+                                           clientgroup=self.database_clientgroup)
 
         for instance in self.get_non_database_instances():
             self._create_database_monitors(host=instance.dns,
                                            dbtype='mongodb',
-                                           alarm='yes',
+                                           alarm='group',
+                                           clientgroup=self.database_clientgroup,
                                            arbiter='1')
 
 
 class RedisZabbixProvider(DatabaseZabbixProvider):
 
     def create_database_monitors(self,):
+        clientgroup = []
+        if self.clientgroup:
+            clientgroup.append(self.clientgroup)
+        if self.database_clientgroup:
+            clientgroup.append(self.database_clientgroup)
 
-        if self.__is_ha__:
-            alarm = "yes"
-        else:
-            alarm = "group"
         params = {
             "notes": self.get_databaseifra_name(),
             "regexp": "WORKING",
-            "alarm": alarm,
-            "clientgroup": self.clientgroup,
+            "alarm": "group",
+            "clientgroup": clientgroup,
         }
         for instance in self.get_database_instances():
             params["address"] = instance.dns

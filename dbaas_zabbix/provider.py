@@ -11,7 +11,6 @@ class ZabbixProvider(object):
 
     def __init__(self, dbaas_api, zabbix_api):
         self.dbaas_api = dbaas_api
-        self.clientgroup = dbaas_api.get_credential_clientgroup()
         self.api = zabbix_api(dbaas_api.get_credential_endpoint())
         self.api.login(user=dbaas_api.get_credential_user(),
                        password=dbaas_api.get_credential_password())
