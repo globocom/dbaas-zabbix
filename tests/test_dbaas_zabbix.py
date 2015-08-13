@@ -56,11 +56,12 @@ class TestZabbixApi(unittest.TestCase):
             ip = params.get('ip')
             hostname = params.get('host')
             clientgroup = params.get('clientgroup')
+            provider_clientgroup = self.zabbix_provider.main_clientgroup
             method_called = call.get('method')
 
             self.assertEqual(ip, host.address)
             self.assertEqual(hostname, host.hostname)
-            self.assertEqual(clientgroup, self.zabbix_provider.clientgroup)
+            self.assertEqual(clientgroup, provider_clientgroup)
             self.assertEqual(method_called, method)
 
     def test_delete_monitors(self):
