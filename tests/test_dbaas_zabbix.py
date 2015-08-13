@@ -5,6 +5,7 @@ from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
 from dbaas_zabbix import provider_factory
 from dbaas_zabbix import database_providers
 from dbaas_zabbix import factory_for
+from dbaas_zabbix.custom_exceptions import NotImplementedError
 from tests import factory
 
 
@@ -182,6 +183,17 @@ class TestProviderFactory(unittest.TestCase):
 
         self.assertIsInstance(provider,
                               database_providers.FakeSingleZabbixProvider)
+
+    def test_provider_class_does_not_exists(self):
+        databaseinfra = factory.set_up_databaseinfra(is_ha=False,
+                                                     name='bazinga')
+
+        def call_factpry():
+            factory_for(databaseinfra=databaseinfra,
+                        credentials=self.credential,
+                        zabbix_api=self.zabbix_api)
+
+        self.assertRaises(NotImplementedError, callableObj=call_factpry)
 
     def tearDown(self):
         pass

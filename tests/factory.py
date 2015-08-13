@@ -41,11 +41,11 @@ class Driver(object):
 
 
 class DatabaseInfra(object):
-    def __init__(self, instances, environment, plan):
+    def __init__(self, instances, environment, plan, name):
         self.instances = instances
         self.environment = environment
-        self.name = "fake"
-        self.engine = Engine('fake')
+        self.name = name
+        self.engine = Engine(name)
         self.plan = plan
 
     def get_driver(self):
@@ -61,7 +61,7 @@ class InstanceList(list):
         return self
 
 
-def set_up_databaseinfra(is_ha=True):
+def set_up_databaseinfra(is_ha=True, name="fake"):
     instances = InstanceList()
     plan = Plan(is_ha)
     for n in range(1, 4):
@@ -72,7 +72,7 @@ def set_up_databaseinfra(is_ha=True):
         instance = Instance(dns + '.database.com', host)
         instances.append(instance)
 
-    return DatabaseInfra(instances, 'development', plan)
+    return DatabaseInfra(instances, 'development', plan, name)
 
 
 class FakeZabbixAPI(object):
