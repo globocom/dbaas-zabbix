@@ -35,10 +35,13 @@ class ZabbixProvider(object):
         LOG.info("Creating web monitor with params: {}".format(kwargs))
         return self.api.globo.createWebMonitors(**kwargs)
 
-    def get_host_info(self, **kwargs):
+    def _get_host_info(self, **kwargs):
         return self.api.host.get(**kwargs)
 
-    def get_host_group_info(self, **kwargs):
+    def _update_host_info(self, **kwargs):
+        return self.api.host.update(**kwargs)
+
+    def _get_host_group_info(self, **kwargs):
         return self.api.hostgroup.get(**kwargs)
 
     def create_basic_monitors(self, **kwargs):
