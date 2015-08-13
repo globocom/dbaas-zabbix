@@ -35,6 +35,9 @@ class ZabbixProvider(object):
         LOG.info("Creating web monitor with params: {}".format(kwargs))
         return self.api.globo.createWebMonitors(**kwargs)
 
+    def get_host_info(self, **kwargs):
+        return self.api.host.get(**kwargs)
+
     def create_basic_monitors(self, **kwargs):
         raise NotImplementedError
 

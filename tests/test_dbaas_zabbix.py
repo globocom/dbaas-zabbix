@@ -120,6 +120,16 @@ class TestZabbixApi(unittest.TestCase):
             self.assertEqual(last_call['method'], method)
             self.assertEqual(params, last_call_params)
 
+    def test_get_host_info(self):
+        host_filter = {"host": "test"}
+        self.zabbix_provider.get_host_info(output="extend",
+                                           filter=host_filter)
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEquals(last_call_params["output"], "extend")
+        self.assertEquals(last_call_params["filter"], host_filter)
+
     def tearDown(self):
         pass
 
