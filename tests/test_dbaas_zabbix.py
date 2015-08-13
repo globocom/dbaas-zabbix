@@ -145,7 +145,7 @@ class TestZabbixApi(unittest.TestCase):
 
     def test_update_host_info(self):
         self.zabbix_provider._update_host_info(hostid="2132",
-                                                   groups=[1, 2, 3])
+                                               groups=[1, 2, 3])
 
         last_call = self.zabbix_provider.api.last_call[0]
         last_call_params = last_call['params']
