@@ -29,11 +29,19 @@ class DatabaseZabbixProvider(ZabbixProvider):
         raise NotImplementedError
 
     def delete_database_monitors(self,):
+        for zabbix_host in self.get_zabbix_databases_hosts():
+            self._delete_monitors(host=zabbix_host)
+
+    def get_zabbix_databases_hosts(self,):
+        zabbix_hosts = []
+
         for instance in self.get_all_instances():
-            self._delete_monitors(host=instance.dns)
+            zabbix_hosts.append(instance.dns)
 
         for instance in self.get_databaseinfra_secondary_ips():
-            self._delete_monitors(host=instance.dns)
+            zabbix_hosts.append(instance.dns)
+
+        return zabbix_hosts
 
 
 class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
@@ -118,8 +126,9 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
         if self.extra_clientgroup:
             clientgroup.append(self.extra_clientgroup)
 
+        notes = self.get_credential_alarm_notes()
         params = {
-            "notes": self.get_databaseifra_name(),
+            "notes": notes,
             "regexp": "WORKING",
             "alarm": "group",
             "clientgroup": clientgroup,
@@ -140,16 +149,19 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             params["uri"] = "/health-check/sentinel-con/"
             self._create_web_monitors(**params)
 
-    def delete_database_monitors(self,):
+    def get_zabbix_databases_hosts(self,):
+        zabbix_hosts = []
         for instance in self.get_database_instances():
             host = "webmonitor_{}-80-redis-con".format(instance.dns)
-            self._delete_monitors(host=host)
+            zabbix_hosts.append(host)
             host = "webmonitor_{}-80-redis-mem".format(instance.dns)
-            self._delete_monitors(host=host)
+            zabbix_hosts.append(host)
 
         for instance in self.get_non_database_instances():
             host = "webmonitor_{}-80-sentinel-con".format(instance.dns)
-            self._delete_monitors(host=host)
+            zabbix_hosts.append(host)
+
+        return zabbix_hosts
 
 
 class RedisSingleZabbixProvider(RedisZabbixProvider):
