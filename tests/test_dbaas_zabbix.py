@@ -5,7 +5,6 @@ from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
 from dbaas_zabbix import provider_factory
 from dbaas_zabbix import database_providers
 from dbaas_zabbix import factory_for
-from dbaas_zabbix.custom_exceptions import NotImplementedError
 from tests import factory
 
 
@@ -16,18 +15,18 @@ class TestDatabaseAsAServiceApi(unittest.TestCase):
                                                factory.FakeCredential())
 
     def test_get_all_instances(self):
-        instances = self.dbaas_api.get_all_instances()
+        instances = self.dbaas_api.instances
         infra_instances = self.databaseinfra.instances.all()
         self.assertListEqual(instances, infra_instances)
 
     def test_databaseinfra_driver(self):
-        driver = self.dbaas_api.get_databaseinfra_driver()
+        driver = self.dbaas_api.driver
         self.assertIsInstance(driver, factory.Driver)
 
     def test_get_hosts(self):
         instances = self.databaseinfra.instances.all()
         hosts = list(set([instance.hostname for instance in instances]))
-        self.assertEqual(hosts, self.dbaas_api.get_hosts())
+        self.assertEqual(hosts, self.dbaas_api.hosts)
 
     def tearDown(self):
         pass
@@ -48,7 +47,7 @@ class TestZabbixApi(unittest.TestCase):
 
     def assert_create_basic_monitor_call(self, last_calls):
         method = 'globo.createBasicMonitors'
-        hosts = self.zabbix_provider.get_hosts()
+        hosts = self.zabbix_provider.hosts
         for index, call in enumerate(last_calls):
             params = call.get('params')
             host = hosts[index]
@@ -71,7 +70,7 @@ class TestZabbixApi(unittest.TestCase):
 
     def assert_delete_monitors(self, last_calls):
         method = 'globo.deleteMonitors'
-        hosts = self.zabbix_provider.get_hosts()
+        hosts = self.zabbix_provider.hosts
         for index, call in enumerate(last_calls):
             host = hosts[index]
 
@@ -88,7 +87,7 @@ class TestZabbixApi(unittest.TestCase):
 
     def assert_delete_database_monitors(self, last_calls):
         method = 'globo.deleteMonitors'
-        instances = self.zabbix_provider.get_all_instances()
+        instances = self.zabbix_provider.instances
         for index, call in enumerate(last_calls):
             instance = instances[index]
 
@@ -99,9 +98,9 @@ class TestZabbixApi(unittest.TestCase):
             self.assertEqual(method_called, method)
 
     def test_create_web_monitors(self):
-        instances = self.zabbix_provider.get_all_instances()
+        instances = self.zabbix_provider.instances
         for instance in instances:
-            dbinfra_name = self.zabbix_provider.get_databaseifra_name()
+            dbinfra_name = self.zabbix_provider.databaseifra_name
             params = {"address": instance.dns,
                       "port": "80", "regexp": "WORKING",
                       "uri": "/health-check/redis-con/", "var": "redis-con",
@@ -158,7 +157,7 @@ class TestZabbixApi(unittest.TestCase):
 
 class TestProviderFactory(unittest.TestCase):
     def setUp(self):
-        self.available_providers = provider_factory.get_available_providers()
+        self.available_providers = provider_factory.available_providers()
         self.provider_name = 'fake'
         databaseinfra = factory.set_up_databaseinfra()
         self.credential = factory.FakeCredential()
@@ -220,12 +219,12 @@ class TestProviderFactory(unittest.TestCase):
         databaseinfra = factory.set_up_databaseinfra(is_ha=False,
                                                      name='bazinga')
 
-        def call_factpry():
+        def call_factory():
             factory_for(databaseinfra=databaseinfra,
                         credentials=self.credential,
                         zabbix_api=self.zabbix_api)
 
-        self.assertRaises(NotImplementedError, callableObj=call_factpry)
+        self.assertRaises(NotImplementedError, callableObj=call_factory)
 
     def tearDown(self):
         pass

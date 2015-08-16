@@ -115,7 +115,8 @@ class FakeZabbixAPIObjectClass(object):
 
 
 class FakeDatabaseZabbixProvider(DatabaseZabbixProvider):
-    def get_databaseinfra_secondary_ips(self,):
+    @property
+    def secondary_ips(self,):
         return []
 
 

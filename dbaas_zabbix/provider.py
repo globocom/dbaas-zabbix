@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-from dbaas_zabbix.custom_exceptions import NotImplementedError
 
 LOG = logging.getLogger(__name__)
 
@@ -11,13 +10,11 @@ class ZabbixProvider(object):
 
     def __init__(self, dbaas_api, zabbix_api):
         self.dbaas_api = dbaas_api
-        self.api = zabbix_api(dbaas_api.get_credential_endpoint())
-        self.api.login(user=dbaas_api.get_credential_user(),
-                       password=dbaas_api.get_credential_password())
+        self.api = zabbix_api(dbaas_api.endpoint)
+        self.api.login(user=dbaas_api.user, password=dbaas_api.password)
 
     def __getattr__(self, name):
-        if name.startswith('get_'):
-            return getattr(self.dbaas_api, name)
+        return getattr(self.dbaas_api, name)
 
     def _delete_monitors(self, host):
         LOG.info("Destroying monitor for host: {}".format(host))

@@ -1,4 +1,0 @@
-
-
-class NotImplementedError(Exception):
-    pass
