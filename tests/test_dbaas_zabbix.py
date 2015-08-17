@@ -38,7 +38,8 @@ class TestZabbixApi(unittest.TestCase):
         zabbix_api = factory.FakeZabbixAPI
         dbaas_api = DatabaseAsAServiceApi(self.databaseinfra,
                                           factory.FakeCredential())
-        self.zabbix_provider = factory.FakeDatabaseZabbixProvider(dbaas_api, zabbix_api)
+        self.zabbix_provider = factory.FakeDatabaseZabbixProvider(dbaas_api,
+                                                                  zabbix_api)
 
     def test_create_basic_monitors(self):
         self.zabbix_provider.create_basic_monitors()
@@ -190,7 +191,6 @@ class TestProviderFactory(unittest.TestCase):
     def test_provider_factory_single_instance(self):
         databaseinfra = factory.set_up_databaseinfra(is_ha=False)
         provider_class = database_providers.FakeSingleZabbixProvider
-
         self.assert_provider_factory(databaseinfra, provider_class)
 
     def assert_provider_factory(self, databaseinfra, provider_class):

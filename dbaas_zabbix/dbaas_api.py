@@ -27,6 +27,10 @@ class DatabaseAsAServiceApi(object):
         return self.credentials.get_parameter_by_name("extra_clientgroup")
 
     @property
+    def alarm_notes(self):
+        return self.credentials.get_parameter_by_name("alarm_notes")
+
+    @property
     def instances(self):
         return self.databaseinfra.instances.all()
 
