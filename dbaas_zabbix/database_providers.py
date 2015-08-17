@@ -150,7 +150,7 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
 
     def get_zabbix_databases_hosts(self,):
         zabbix_hosts = []
-        for instance in self.instances:
+        for instance in self.database_instances:
             host = "webmonitor_{}-80-redis-con".format(instance.dns)
             zabbix_hosts.append(host)
             host = "webmonitor_{}-80-redis-mem".format(instance.dns)
