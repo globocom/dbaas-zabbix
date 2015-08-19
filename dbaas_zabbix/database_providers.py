@@ -42,6 +42,11 @@ class DatabaseZabbixProvider(ZabbixProvider):
 
         return zabbix_hosts
 
+    def update_host_interface(self, host_name, **kwargs):
+        host_id = self.get_host_id(host_name)
+        interface_id = self.get_host_interface_id(host_id)
+        return self._update_host_interface(interfaceid=interface_id, **kwargs)
+
 
 class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mysql'
