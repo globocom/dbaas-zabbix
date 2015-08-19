@@ -67,10 +67,12 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
                       'alarm': 'group',
                       'clientgroup': clientgroup,
                       'dbtype': 'mysql',
-                      'healthcheck': {'port': '80',
+                      'healthcheck': {'host': instance.dns,
+                                      'port': '80',
                                       'string': 'WORKING',
                                       'uri': 'health-check/'},
-                      'healthcheck_monitor': {'port': '80',
+                      'healthcheck_monitor': {'host': instance.dns,
+                                              'port': '80',
                                               'string': 'WORKING',
                                               'uri': 'health-check/monitor/'}}
 
