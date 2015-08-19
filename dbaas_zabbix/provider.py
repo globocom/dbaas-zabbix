@@ -35,6 +35,20 @@ class ZabbixProvider(object):
     def _get_host_info(self, **kwargs):
         return self.api.host.get(**kwargs)
 
+    def get_host_id(self, host_name):
+        host_info = self._get_host_info(search={'name': host_name})
+        return host_info[0]['hostid']
+
+    def _update_host_interface(self, **kwargs):
+        return self.api.hostinterface.update(**kwargs)
+
+    def _get_host_interface(self, **kwargs):
+        return self.api.hostinterface.get(**kwargs)
+
+    def get_host_interface_id(self, host_id):
+        host_interface = self.api.hostinterface.get(hostids=host_id)
+        return host_interface[0]['interfaceid']
+
     def _update_host_info(self, **kwargs):
         return self.api.host.update(**kwargs)
 
@@ -51,4 +65,7 @@ class ZabbixProvider(object):
         raise NotImplementedError
 
     def delete_database_monitors(self, **kwargs):
+        raise NotImplementedError
+
+    def update_host_interface(self, **kwargs):
         raise NotImplementedError
