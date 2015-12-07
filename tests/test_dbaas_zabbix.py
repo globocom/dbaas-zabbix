@@ -121,6 +121,24 @@ class TestZabbixApi(unittest.TestCase):
             self.assertEqual(last_call['method'], method)
             self.assertEqual(params, last_call_params)
 
+    def test_get_disable_alarms(self):
+        host = {"host": "test"}
+        self.zabbix_provider._disable_alarms(host=host)
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEquals(last_call_params["host"], host)
+        self.assertEquals(last_call["method"], "globo.disableAlarms")
+
+    def test_get_enable_alarms(self):
+        host = {"host": "test"}
+        self.zabbix_provider._enable_alarms(host=host)
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEquals(last_call_params["host"], host)
+        self.assertEquals(last_call["method"], "globo.enableAlarms")
+
     def test_get_host_info(self):
         host_filter = {"host": "test"}
         self.zabbix_provider._get_host_info(output="extend",
