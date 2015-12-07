@@ -42,6 +42,20 @@ class DatabaseZabbixProvider(ZabbixProvider):
 
         return zabbix_hosts
 
+    def disable_alarms(self,):
+        for host in self.hosts:
+            self._disable_alarms(host=host.hostname)
+
+        for database_host in self.get_zabbix_databases_hosts():
+            self._disable_alarms(host=database_host)
+
+    def enable_alarms(self,):
+        for host in self.hosts:
+            self._enable_alarms(host=host.hostname)
+
+        for database_host in self.get_zabbix_databases_hosts():
+            self._enable_alarms(host=database_host)
+
     def update_host_interface(self, host_name, **kwargs):
         host_id = self.get_host_id(host_name)
         interface_id = self.get_host_interface_id(host_id)
