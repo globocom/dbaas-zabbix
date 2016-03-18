@@ -128,3 +128,6 @@ class FakeCredential(object):
 
         def get_parameter_by_name(self, name):
             return ''
+
+        def get_parameters_by_group(self, group_name):
+            return {}

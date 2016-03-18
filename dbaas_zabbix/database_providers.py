@@ -15,10 +15,16 @@ class DatabaseZabbixProvider(ZabbixProvider):
     def create_basic_monitors(self, ):
         clientgroup = self.main_clientgroup
         for host in self.hosts:
-            self._create_basic_monitors(host=host.hostname,
-                                        ip=host.address,
-                                        clientgroup=clientgroup,
-                                        alarm="group")
+            self._create_basic_monitors(
+                host=host.hostname, ip=host.address, clientgroup=clientgroup,
+                alarm="group", **self.get_basic_monitors_extra_parameters()
+            )
+
+    def get_basic_monitors_extra_parameters(self):
+            return self.extra_parameters('create_basic_monitors')
+
+    def get_database_monitors_extra_parameters(self):
+            return self.extra_parameters('create_database_monitors')
 
     def delete_basic_monitors(self, ):
         for host in self.hosts:
@@ -69,10 +75,10 @@ class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
     def create_database_monitors(self,):
         clientgroup = self.extra_clientgroup
         for instance in self.instances:
-            self._create_database_monitors(host=instance.dns,
-                                           dbtype='mysql',
-                                           alarm='group',
-                                           clientgroup=clientgroup)
+            self._create_database_monitors(
+                host=instance.dns, dbtype='mysql', alarm='group',
+                clientgroup=clientgroup,
+                **self.get_database_monitors_extra_parameters())
 
 
 class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
@@ -81,6 +87,7 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
 
     def create_database_monitors(self,):
         clientgroup = self.extra_clientgroup
+        extra_parameters = self.get_database_monitors_extra_parameters()
         for instance in self.database_instances:
             params = {'host': instance.dns,
                       'alarm': 'group',
@@ -94,14 +101,13 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
                                               'port': '80',
                                               'string': 'WORKING',
                                               'uri': 'health-check/monitor/'}}
-
+            params.update(extra_parameters)
             self._create_database_monitors(**params)
 
         for instance in self.secondary_ips:
-            self._create_database_monitors(host=instance.dns,
-                                           dbtype='mysql',
-                                           alarm='group',
-                                           clientgroup=clientgroup)
+            self._create_database_monitors(
+                host=instance.dns, dbtype='mysql',
+                alarm='group', clientgroup=clientgroup, **extra_parameters)
 
 
 class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
@@ -111,10 +117,10 @@ class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
     def create_database_monitors(self):
         clientgroup = self.extra_clientgroup
         for instance in self.instances:
-            self._create_database_monitors(host=instance.dns,
-                                           dbtype='mongodb',
-                                           alarm="group",
-                                           clientgroup=clientgroup)
+            self._create_database_monitors(
+                host=instance.dns, dbtype='mongodb',
+                alarm="group", clientgroup=clientgroup,
+                **self.get_database_monitors_extra_parameters())
 
 
 class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
@@ -124,17 +130,16 @@ class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     def create_database_monitors(self,):
         clientgroup = self.extra_clientgroup
         for instance in self.database_instances:
-            self._create_database_monitors(host=instance.dns,
-                                           dbtype='mongodb',
-                                           alarm="group",
-                                           clientgroup=clientgroup)
+            self._create_database_monitors(
+                host=instance.dns, dbtype='mongodb',
+                alarm="group", clientgroup=clientgroup,
+                **self.get_database_monitors_extra_parameters())
 
         for instance in self.non_database_instances:
-            self._create_database_monitors(host=instance.dns,
-                                           dbtype='mongodb',
-                                           alarm='group',
-                                           clientgroup=clientgroup,
-                                           arbiter='1')
+            self._create_database_monitors(
+                host=instance.dns, dbtype='mongodb',
+                alarm='group', clientgroup=clientgroup,
+                arbiter='1', **self.get_database_monitors_extra_parameters())
 
 
 class RedisZabbixProvider(DatabaseZabbixProvider):
@@ -146,6 +151,8 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
         if self.extra_clientgroup:
             clientgroup.append(self.extra_clientgroup)
 
+        extra_parameters = self.get_database_monitors_extra_parameters()
+
         notes = self.alarm_notes
         params = {
             "notes": notes,
@@ -153,6 +160,8 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             "alarm": "group",
             "clientgroup": clientgroup,
         }
+        params.update(extra_parameters)
+
         for instance in self.database_instances:
             params["address"] = instance.dns
             params["var"] = "redis-con"
