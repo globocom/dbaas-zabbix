@@ -144,6 +144,9 @@ class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
 
 class RedisZabbixProvider(DatabaseZabbixProvider):
 
+    def get_web_monitors_extra_parameters(self,):
+        return self.extra_parameters('create_web_monitors')
+
     def create_database_monitors(self,):
         clientgroup = []
         if self.main_clientgroup:
@@ -151,7 +154,7 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
         if self.extra_clientgroup:
             clientgroup.append(self.extra_clientgroup)
 
-        extra_parameters = self.get_database_monitors_extra_parameters()
+        extra_parameters = self.get_web_monitors_extra_parameters()
 
         notes = self.alarm_notes
         params = {
