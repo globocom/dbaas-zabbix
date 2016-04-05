@@ -159,26 +159,26 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
         notes = self.alarm_notes
         params = {
             "notes": notes,
-            "regexp": "WORKING",
+            "required_string": "WORKING",
             "alarm": "group",
+            "project": self.database_project_name,
             "clientgroup": clientgroup,
         }
         params.update(extra_parameters)
 
         for instance in self.database_instances:
-            params["address"] = instance.dns
-            params["var"] = "redis-con"
-            params["uri"] = "/health-check/redis-con/"
+            prefix = "http://{}:80".format(instance.dns)
+            params["hostname"] = instance.dns
+
+            params["url"] = "{}/health-check/redis-con/".format(prefix)
             self._create_web_monitors(**params)
 
-            params["var"] = "redis-mem"
-            params["uri"] = "/health-check/redis-mem/"
+            params["url"] = "{}/health-check/redis-mem/".format(prefix)
             self._create_web_monitors(**params)
 
         for instance in self.non_database_instances:
-            params["address"] = instance.dns
-            params["var"] = "sentinel-con"
-            params["uri"] = "/health-check/sentinel-con/"
+            params["hostname"] = instance.dns
+            params["url"] = "/health-check/sentinel-con/"
             self._create_web_monitors(**params)
 
     def get_zabbix_databases_hosts(self,):
