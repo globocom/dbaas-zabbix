@@ -175,7 +175,7 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             self._create_web_monitors(**params)
 
         for instance in self.non_database_instances:
-            params["url"] = "/health-check/sentinel-con/"
+            params["url"] = "{}/health-check/sentinel-con/".format(prefix)
             self._create_web_monitors(**params)
 
     def get_zabbix_databases_hosts(self,):
