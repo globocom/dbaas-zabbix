@@ -161,14 +161,12 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             "notes": notes,
             "required_string": "WORKING",
             "alarm": "group",
-            "project": self.database_project_name,
             "clientgroup": clientgroup,
         }
         params.update(extra_parameters)
 
         for instance in self.database_instances:
             prefix = "http://{}:80".format(instance.dns)
-            params["hostname"] = instance.dns
 
             params["url"] = "{}/health-check/redis-con/".format(prefix)
             self._create_web_monitors(**params)
@@ -177,7 +175,6 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             self._create_web_monitors(**params)
 
         for instance in self.non_database_instances:
-            params["hostname"] = instance.dns
             params["url"] = "/health-check/sentinel-con/"
             self._create_web_monitors(**params)
 
