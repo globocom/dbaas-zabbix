@@ -180,16 +180,16 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
 
     def get_zabbix_databases_hosts(self,):
         zabbix_hosts = []
-        prefix = '_80_health-check_'
+        suffix = ':80/health-check/'
 
         for instance in self.database_instances:
-            host = "web_{}{}redis-con_".format(instance.dns, prefix)
+            host = "web_{}{}redis-con/".format(instance.dns, suffix)
             zabbix_hosts.append(host)
-            host = "web_{}{}redis-mem_".format(instance.dns, prefix)
+            host = "web_{}{}redis-mem/".format(instance.dns, suffix)
             zabbix_hosts.append(host)
 
         for instance in self.non_database_instances:
-            host = "web_{}{}sentinel-con_".format(instance.dns, prefix)
+            host = "web_{}{}sentinel-con/".format(instance.dns, suffix)
             zabbix_hosts.append(host)
 
         return zabbix_hosts
