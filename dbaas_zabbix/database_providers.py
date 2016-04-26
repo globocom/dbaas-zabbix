@@ -165,17 +165,21 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
         }
         params.update(extra_parameters)
 
+        hc_url = "http://{}:80"
         for instance in self.database_instances:
-            prefix = "http://{}:80".format(instance.dns)
+            custom_hc_url = hc_url.format(instance.dns)
 
-            params["url"] = "{}/health-check/redis-con/".format(prefix)
+            params["url"] = "{}/health-check/redis-con/".format(custom_hc_url)
             self._create_web_monitors(**params)
 
-            params["url"] = "{}/health-check/redis-mem/".format(prefix)
+            params["url"] = "{}/health-check/redis-mem/".format(custom_hc_url)
             self._create_web_monitors(**params)
 
         for instance in self.non_database_instances:
-            params["url"] = "{}/health-check/sentinel-con/".format(prefix)
+            custom_hc_url = hc_url.format(instance.dns)
+            params["url"] = "{}/health-check/sentinel-con/".format(
+                custom_hc_url
+            )
             self._create_web_monitors(**params)
 
     def get_zabbix_databases_hosts(self,):
