@@ -8,8 +8,9 @@ class Host(object):
 
 
 class Engine(object):
-    def __init__(self, name):
+    def __init__(self, name, version='0.0.0'):
         self.engine_type = EngineType(name)
+        self.version = version
 
 
 class EngineType(object):

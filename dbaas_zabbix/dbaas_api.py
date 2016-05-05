@@ -68,3 +68,7 @@ class DatabaseAsAServiceApi(object):
     @property
     def engine_name(self):
         return self.databaseinfra.engine.engine_type.name
+
+    @property
+    def engine_version(self):
+        return self.databaseinfra.engine.version

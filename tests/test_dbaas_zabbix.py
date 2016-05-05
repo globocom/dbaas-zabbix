@@ -193,17 +193,21 @@ class TestProviderFactory(unittest.TestCase):
     def test_provider_factory_get_provider_class_single(self):
         provider_class = database_providers.FakeSingleZabbixProvider
         self.assert_provider_factory_get_provider_class(False,
-                                                        provider_class)
+                                                        provider_class,
+                                                        '0.0.0')
 
     def test_provider_factory_get_provider_class_ha(self):
         provider_class = database_providers.FakeHAZabbixProvider
         self.assert_provider_factory_get_provider_class(True,
-                                                        provider_class)
+                                                        provider_class,
+                                                        '1.1.1')
 
     def assert_provider_factory_get_provider_class(self, is_ha,
-                                                   provider_class):
+                                                   provider_class,
+                                                   version):
         provider = provider_factory.ProviderFactory.get_provider_class('fake',
-                                                                       is_ha)
+                                                                       is_ha,
+                                                                       version)
         self.assertEqual(provider, provider_class)
 
     def test_provider_factory_single_instance(self):
@@ -221,6 +225,7 @@ class TestProviderFactory(unittest.TestCase):
     def test_provider_factory_ha(self):
         databaseinfra = factory.set_up_databaseinfra(is_ha=True)
         provider_class = database_providers.FakeHAZabbixProvider
+        databaseinfra.engine.version = '1.1.1'
 
         self.assert_provider_factory(databaseinfra, provider_class)
 

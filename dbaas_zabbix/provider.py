@@ -7,6 +7,7 @@ LOG = logging.getLogger(__name__)
 class ZabbixProvider(object):
     __provider_name__ = None
     __is_ha__ = None
+    __version__ = None
 
     def __init__(self, dbaas_api, zabbix_api):
         self.dbaas_api = dbaas_api

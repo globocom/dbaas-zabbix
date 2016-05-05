@@ -71,6 +71,7 @@ class DatabaseZabbixProvider(ZabbixProvider):
 class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mysql'
     __is_ha__ = False
+    __version__ = '5.6.15'
 
     def create_database_monitors(self,):
         clientgroup = self.extra_clientgroup
@@ -84,6 +85,7 @@ class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
 class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mysql'
     __is_ha__ = True
+    __version__ = '5.6.15'
 
     def create_database_monitors(self,):
         clientgroup = self.extra_clientgroup
@@ -113,6 +115,7 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
 class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = False
+    __version__ = '2.4.10'
 
     def create_database_monitors(self):
         clientgroup = self.extra_clientgroup
@@ -126,6 +129,7 @@ class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
 class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = True
+    __version__ = '2.4.10'
 
     def create_database_monitors(self,):
         clientgroup = self.extra_clientgroup
@@ -202,16 +206,19 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
 class RedisSingleZabbixProvider(RedisZabbixProvider):
     __provider_name__ = 'redis'
     __is_ha__ = False
+    __version__ = '2.8.17'
 
 
 class RedisHighAvailabilityZabbixProvider(RedisZabbixProvider):
     __provider_name__ = 'redis'
     __is_ha__ = True
+    __version__ = '2.8.17'
 
 
 class FakeSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'fake'
     __is_ha__ = False
+    __version__ = '0.0.0'
 
     def create_database_monitors(self, alarm='group'):
         instances = self.instances
@@ -221,6 +228,7 @@ class FakeSingleZabbixProvider(DatabaseZabbixProvider):
 class FakeHAZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'fake'
     __is_ha__ = True
+    __version__ = '1.1.1'
 
     def create_database_monitors(self, alarm='group'):
         instances = self.instances
