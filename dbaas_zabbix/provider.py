@@ -26,8 +26,12 @@ class ZabbixProvider(object):
         return self.api.globo.createBasicMonitors(**kwargs)
 
     def _create_database_monitors(self, **kwargs):
-        LOG.info("Creating databse monitor with params: {}".format(kwargs))
+        LOG.info("Creating database monitor with params: {}".format(kwargs))
         return self.api.globo.createDBMonitors(**kwargs)
+
+    def _create_mongo_three_monitors(self, **kwargs):
+        LOG.info("Creating mongo3 monitor with params: {}".format(kwargs))
+        return self.api.globo.createMongo3Monitors(**kwargs)
 
     def _create_web_monitors(self, **kwargs):
         LOG.info("Creating web monitor with params: {}".format(kwargs))
