@@ -51,7 +51,7 @@ class DatabaseAsAServiceApi(object):
 
     @property
     def hosts(self):
-        return list(set([instance.hostname for instance in self.instances]))
+        return list({instance.hostname for instance in self.instances})
 
     @property
     def databaseifra_name(self):
