@@ -218,7 +218,7 @@ class RedisHighAvailabilityZabbixProvider(RedisZabbixProvider):
 class MongoDBThreeDotZeroSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = False
-    __version__ = '3.0.8'
+    __version__ = '3.0.12'
 
     def create_database_monitors(self):
         clientgroup = self.extra_clientgroup
@@ -231,7 +231,7 @@ class MongoDBThreeDotZeroSingleZabbixProvider(DatabaseZabbixProvider):
 class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = True
-    __version__ = '3.0.8'
+    __version__ = '3.0.12'
 
     def create_database_monitors(self,):
         clientgroup = self.extra_clientgroup
