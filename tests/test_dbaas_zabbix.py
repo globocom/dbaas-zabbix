@@ -35,11 +35,12 @@ class TestDatabaseAsAServiceApi(unittest.TestCase):
 class TestZabbixApi(unittest.TestCase):
     def setUp(self):
         self.databaseinfra = factory.set_up_databaseinfra()
-        zabbix_api = factory.FakeZabbixAPI
-        dbaas_api = DatabaseAsAServiceApi(self.databaseinfra,
-                                          factory.FakeCredential())
-        self.zabbix_provider = factory.FakeDatabaseZabbixProvider(dbaas_api,
-                                                                  zabbix_api)
+        self.zabbix_api = factory.FakeZabbixAPI
+        self.dbaas_api = DatabaseAsAServiceApi(
+            self.databaseinfra, factory.FakeCredential())
+        self.zabbix_provider = factory.FakeDatabaseZabbixProvider(
+            self.dbaas_api, self.zabbix_api
+        )
 
     def test_create_basic_monitors(self):
         self.zabbix_provider.create_basic_monitors()
@@ -169,6 +170,77 @@ class TestZabbixApi(unittest.TestCase):
         last_call_params = last_call['params']
         self.assertEqual(last_call_params["hostid"], "2132")
         self.assertEqual(last_call["method"], "host.update")
+
+    def test_create_db_monitors(self):
+        self.zabbix_provider._create_database_monitors(
+            dbtype='fake', alarm='group', host='fake01.test.com')
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEquals(last_call_params["dbtype"], 'fake')
+        self.assertEquals(last_call_params["alarm"], 'group')
+        self.assertEquals(last_call_params["host"], 'fake01.test.com')
+        self.assertEquals(last_call["method"], "globo.createDBMonitors")
+
+    def test_create_mongo_three_monitors(self):
+        self.zabbix_provider._create_mongo_three_monitors(
+            dbtype='fake', alarm='group', host='fake02.test.com'
+        )
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEquals(last_call_params["dbtype"], 'fake')
+        self.assertEquals(last_call_params["alarm"], 'group')
+        self.assertEquals(last_call_params["host"], 'fake02.test.com')
+        self.assertEquals(last_call["method"], "globo.createMongo3Monitors")
+
+    def test_update_host_interface(self):
+        self.zabbix_provider._update_host_interface(hostid="2133")
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEqual(last_call_params["hostid"], "2133")
+        self.assertEqual(last_call["method"], "hostinterface.update")
+
+    def test_get_host_interface(self):
+        self.zabbix_provider._get_host_interface(hostid="2134")
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEquals(last_call["method"], "hostinterface.get")
+        self.assertEqual(last_call_params["hostid"], "2134")
+
+    def test_get_host_id(self):
+        host_id = self.zabbix_provider.get_host_id(
+            host_name="fake05.test.com"
+        )
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEquals(last_call["method"], "host.get")
+        self.assertEquals(
+            last_call_params["search"]["name"], "fake05.test.com"
+        )
+        self.assertEqual(host_id, "3309")
+
+    def test_not_implemented_methods_throws_exceptions(self):
+        from dbaas_zabbix.provider import ZabbixProvider
+        zabbix_provider = ZabbixProvider(self.dbaas_api, self.zabbix_api)
+
+        with self.assertRaises(NotImplementedError):
+            zabbix_provider.create_database_monitors()
+
+        with self.assertRaises(NotImplementedError):
+            zabbix_provider.delete_database_monitors()
+
+        with self.assertRaises(NotImplementedError):
+            zabbix_provider.create_basic_monitors()
+
+        with self.assertRaises(NotImplementedError):
+            zabbix_provider.delete_basic_monitors()
+
+        with self.assertRaises(NotImplementedError):
+            zabbix_provider.update_host_interface(host_name='test')
 
     def tearDown(self):
         pass

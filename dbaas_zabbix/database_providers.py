@@ -228,7 +228,9 @@ class MongoDBThreeDotZeroSingleZabbixProvider(DatabaseZabbixProvider):
                 **self.get_database_monitors_extra_parameters())
 
 
-class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
+class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
+    DatabaseZabbixProvider
+):
     __provider_name__ = 'mongodb'
     __is_ha__ = True
     __version__ = '3.0.12'

@@ -24,7 +24,9 @@ class ProviderFactory(object):
 
 def available_providers():
     available_objects = dir(database_providers)
-    available_klasses = (klass for klass in available_objects if 'Provider' in klass)
+    available_klasses = (
+        klass for klass in available_objects if 'Provider' in klass
+    )
 
     return (database_providers.__getattribute__(klass)for klass in
             available_klasses)
