@@ -215,33 +215,18 @@ class RedisHighAvailabilityZabbixProvider(RedisZabbixProvider):
     __version__ = '2.8.17'
 
 
-class MongoDBThreeDotZeroSingleZabbixProvider(DatabaseZabbixProvider):
+class MongoDBThreeDotZeroSingleZabbixProvider(MongoDBSingleZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = False
     __version__ = '3.0.12'
 
-    def create_database_monitors(self):
-        clientgroup = self.extra_clientgroup
-        for instance in self.instances:
-            self._create_mongo_three_monitors(
-                host=instance.dns, alarm="group", clientgroup=clientgroup,
-                **self.get_database_monitors_extra_parameters())
-
 
 class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
-    DatabaseZabbixProvider
+    MongoDBHighAvailabilityZabbixProvider
 ):
     __provider_name__ = 'mongodb'
     __is_ha__ = True
     __version__ = '3.0.12'
-
-    def create_database_monitors(self,):
-        clientgroup = self.extra_clientgroup
-        for instance in self.instances:
-            self._create_mongo_three_monitors(
-                host=instance.dns, alarm="group",
-                clientgroup=clientgroup, replicaset="1",
-                **self.get_database_monitors_extra_parameters())
 
 
 class FakeSingleZabbixProvider(DatabaseZabbixProvider):
