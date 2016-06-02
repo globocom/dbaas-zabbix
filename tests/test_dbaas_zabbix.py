@@ -223,6 +223,17 @@ class TestZabbixApi(unittest.TestCase):
         )
         self.assertEqual(host_id, "3309")
 
+    def test_get_host_interface_id(self):
+        host_id = self.zabbix_provider.get_host_interface_id(
+            host_id="9981"
+        )
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEquals(last_call["method"], "hostinterface.get")
+        self.assertEquals(last_call_params["hostids"], "9981")
+        self.assertEqual(host_id, "3310")
+
     def test_not_implemented_methods_throws_exceptions(self):
         from dbaas_zabbix.provider import ZabbixProvider
         zabbix_provider = ZabbixProvider(self.dbaas_api, self.zabbix_api)

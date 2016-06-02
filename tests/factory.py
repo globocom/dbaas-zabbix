@@ -96,7 +96,7 @@ class FakeZabbixAPI(object):
         if method == 'host.get':
             request_json = [{'hostid': '3309'}]
         elif method == 'hostinterface.get':
-            request_json = [{'interfaceid': '3309'}]
+            request_json = [{'interfaceid': '3310'}]
 
         return request_json
 
