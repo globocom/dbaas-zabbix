@@ -20,6 +20,15 @@ class DatabaseZabbixProvider(ZabbixProvider):
                 alarm="group", **self.get_basic_monitors_extra_parameters()
             )
 
+    def get_client_groups(self,):
+        clientgroup = []
+        if self.main_clientgroup:
+            clientgroup.append(self.main_clientgroup)
+        if self.extra_clientgroup:
+            clientgroup.append(self.extra_clientgroup)
+
+        return clientgroup
+
     def get_basic_monitors_extra_parameters(self):
             return self.extra_parameters('create_basic_monitors')
 
@@ -152,12 +161,7 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
         return self.extra_parameters('create_web_monitors')
 
     def create_database_monitors(self,):
-        clientgroup = []
-        if self.main_clientgroup:
-            clientgroup.append(self.main_clientgroup)
-        if self.extra_clientgroup:
-            clientgroup.append(self.extra_clientgroup)
-
+        clientgroup = self.get_client_groups()
         extra_parameters = self.get_web_monitors_extra_parameters()
 
         notes = self.alarm_notes
@@ -220,13 +224,39 @@ class MongoDBThreeDotZeroSingleZabbixProvider(MongoDBSingleZabbixProvider):
     __is_ha__ = False
     __version__ = '3.0.12'
 
+    def create_database_monitors(self,):
+        clientgroup = self.extra_clientgroup
+        for instance in self.database_instances:
+            self._create_mongo_three_monitors(
+                host=instance.dns, alarm="group",
+                replicaset="0", clientgroup=clientgroup,
+                **self.get_database_monitors_extra_parameters()
+            )
+
 
 class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
-    MongoDBHighAvailabilityZabbixProvider
+    DatabaseZabbixProvider
 ):
     __provider_name__ = 'mongodb'
     __is_ha__ = True
     __version__ = '3.0.12'
+
+    def create_database_monitors(self,):
+        clientgroup = self.extra_clientgroup
+        for instance in self.database_instances:
+            self._create_mongo_three_monitors(
+                host=instance.dns, alarm="group",
+                replicaset="1", clientgroup=clientgroup,
+                **self.get_database_monitors_extra_parameters()
+            )
+
+        clientgroup = self.get_client_groups()
+        for instance in self.non_database_instances:
+            self._create_tcp_monitors(
+                host=instance.dns, port=instance.port, alarm='group',
+                clientgroup=clientgroup,
+                **self.get_database_monitors_extra_parameters()
+            )
 
 
 class FakeSingleZabbixProvider(DatabaseZabbixProvider):
