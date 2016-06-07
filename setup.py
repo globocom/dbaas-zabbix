@@ -19,7 +19,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='dbaas_zabbix',
-    version='0.3.9',
+    version='0.4.0',
     description='A Zabbix Integration for DBaaS.',
     long_description=readme + '\n\n' + history,
     author='Felippe Raposo',
