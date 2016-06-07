@@ -253,6 +253,16 @@ class TestZabbixApi(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             zabbix_provider.update_host_interface(host_name='test')
 
+    def test_create_tcp_monitors(self):
+        self.zabbix_provider._create_tcp_monitors(
+            doc='Get in touch with me', port=9003, host='fake07.test.com')
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEquals(last_call_params["port"], 9003)
+        self.assertEquals(last_call_params["host"], 'fake07.test.com')
+        self.assertEquals(last_call["method"], "globo.createTCPMonitors")
+
     def tearDown(self):
         pass
 
