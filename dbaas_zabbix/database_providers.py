@@ -253,7 +253,7 @@ class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
         clientgroup = self.get_client_groups()
         for instance in self.non_database_instances:
             self._create_tcp_monitors(
-                host=instance.dns, port=instance.port, alarm='group',
+                host=instance.dns, port=str(instance.port), alarm='group',
                 clientgroup=clientgroup,
                 **self.get_database_monitors_extra_parameters()
             )
