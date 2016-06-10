@@ -258,6 +258,16 @@ class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
                 **self.get_database_monitors_extra_parameters()
             )
 
+    def get_zabbix_databases_hosts(self,):
+        zabbix_hosts = []
+        zabbix_hosts.extend(self.database_instances)
+
+        for instance in self.non_database_instances:
+            host = "tcp_{}-{}".format(instance.dns, instance.port)
+            zabbix_hosts.append(host)
+
+        return zabbix_hosts
+
 
 class FakeSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'fake'
