@@ -260,7 +260,7 @@ class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
 
     def get_zabbix_databases_hosts(self,):
         zabbix_hosts = []
-        zabbix_hosts.extend(self.database_instances)
+        zabbix_hosts.extend((instance.dns for instance in self.database_instances))
 
         for instance in self.non_database_instances:
             host = "tcp_{}-{}".format(instance.dns, instance.port)
