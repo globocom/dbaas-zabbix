@@ -30,10 +30,10 @@ class DatabaseZabbixProvider(ZabbixProvider):
         return clientgroup
 
     def get_basic_monitors_extra_parameters(self):
-            return self.extra_parameters('create_basic_monitors')
+        return self.extra_parameters('create_basic_monitors')
 
     def get_database_monitors_extra_parameters(self):
-            return self.extra_parameters('create_database_monitors')
+        return self.extra_parameters('create_database_monitors')
 
     def delete_basic_monitors(self, ):
         for host in self.hosts:
