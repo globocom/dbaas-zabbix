@@ -58,6 +58,10 @@ class DatabaseAsAServiceApi(object):
         return self.databaseinfra.name
 
     @property
+    def mysql_infra_dns_from_endpoint_dns(self):
+        return self.databaseinfra.endpoint_dns(':')[0]
+
+    @property
     def secondary_ips(self):
         return self.databaseinfra.cs_dbinfra_attributes.all()
 
