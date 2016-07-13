@@ -121,6 +121,35 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
                 alarm='group', clientgroup=clientgroup, **extra_parameters)
 
 
+class MySQLFoxHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
+    __provider_name__ = 'mysql'
+    __is_ha__ = True
+    __version__ = ['5.6.24', ]
+
+    def create_database_monitors(self,):
+        clientgroup = self.extra_clientgroup
+        extra_parameters = self.get_database_monitors_extra_parameters()
+        for instance in self.database_instances:
+            params = {'host': instance.dns,
+                      'alarm': 'group',
+                      'clientgroup': clientgroup,
+                      'dbtype': 'mysql',
+                      'healthcheck': {'host': instance.dns,
+                                      'port': '80',
+                                      'string': 'WORKING',
+                                      'uri': 'health-check/'},
+                      'healthcheck_monitor': {'host': instance.dns,
+                                              'port': '80',
+                                              'string': 'WORKING',
+                                              'uri': 'health-check/monitor/'}}
+            params.update(extra_parameters)
+            self._create_database_monitors(**params)
+
+        self._create_database_monitors(
+            host=self.mysql_infra_dns_from_endpoint_dns, dbtype='mysql',
+            alarm='group', clientgroup=clientgroup, **extra_parameters)
+
+
 class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = False
