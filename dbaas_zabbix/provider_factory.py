@@ -7,7 +7,7 @@ class ProviderFactory(object):
         for klass in available_providers():
             name_eq_klass = driver_name == klass.__provider_name__
             is_ha_eq_klass = is_ha == klass.__is_ha__
-            version_eq_klass = version == klass.__version__
+            version_eq_klass = version in klass.__version__
 
             if name_eq_klass and is_ha_eq_klass and version_eq_klass:
                 return klass
