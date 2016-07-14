@@ -149,6 +149,12 @@ class MySQLFoxHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
             host=self.mysql_infra_dns_from_endpoint_dns, dbtype='mysql',
             alarm='group', clientgroup=clientgroup, **extra_parameters)
 
+    def get_zabbix_databases_hosts(self,):
+        zabbix_hosts = super(MySQLFoxHighAvailabilityZabbixProvider, self).get_zabbix_databases_hosts()
+        zabbix_hosts.append(self.mysql_infra_dns_from_endpoint_dns)
+
+        return zabbix_hosts
+
 
 class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mongodb'
