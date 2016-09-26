@@ -14,6 +14,12 @@ class ZabbixProvider(object):
         self.api = zabbix_api(dbaas_api.endpoint)
         self.api.login(user=dbaas_api.user, password=dbaas_api.password)
 
+    def logout(self):
+        try:
+            self.api.user.logout()
+        except Exception as e:
+            LOG.error('Could not logout. Error: {}'.format(e))
+
     def __getattr__(self, name):
         return getattr(self.dbaas_api, name)
 
