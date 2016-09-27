@@ -28,7 +28,7 @@ lint:
 	flake8 dbaas_zabbix tests
 
 test:
-	nosetests -v tests/
+	py.test -v  tests/
 
 test-all:
 	tox
