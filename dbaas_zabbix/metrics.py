@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from errors import ZabbixApiKeyNotFoundError, ZabbixApiNoDataBetweenTimeError
+from dbaas_zabbix.errors import ZabbixApiKeyNotFoundError, ZabbixApiNoDataBetweenTimeError
 
 KEY_DISK_SIZE_DATA = 'hrStorageSizeInBytes[/data]'
 KEY_DISK_USED_DATA = 'hrStorageUsedInBytes[/data]'
