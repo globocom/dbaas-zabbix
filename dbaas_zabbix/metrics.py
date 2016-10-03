@@ -1,8 +1,8 @@
 from collections import OrderedDict
 from errors import ZabbixApiKeyNotFoundError, ZabbixApiNoDataBetweenTimeError
 
-KEY_DISK_SIZE_DATA = 'hrStorageSize[/data]'
-KEY_DISK_USED_DATA = 'hrStorageUsed[/data]'
+KEY_DISK_SIZE_DATA = 'hrStorageSizeInBytes[/data]'
+KEY_DISK_USED_DATA = 'hrStorageUsedInBytes[/data]'
 
 
 class ZabbixMetrics(object):
@@ -74,7 +74,9 @@ class ZabbixMetrics(object):
         return metrics[last_key]
 
     def get_current_disk_data_size(self, host):
-        return self.get_last_value(key=KEY_DISK_SIZE_DATA, host=host)
+        current_value = self.get_last_value(key=KEY_DISK_SIZE_DATA, host=host)
+        return int(current_value) / 1024
 
     def get_current_disk_data_used(self, host):
-        return self.get_last_value(key=KEY_DISK_USED_DATA, host=host)
+        current_value = self.get_last_value(key=KEY_DISK_USED_DATA, host=host)
+        return int(current_value) / 1024

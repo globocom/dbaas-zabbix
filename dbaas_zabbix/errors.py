@@ -1,19 +1,19 @@
-class ZabbixApiError(EnvironmentError):
+class ZabbixMetricsError(EnvironmentError):
     pass
 
 
-class ZabbixApiKeyNotFoundError(ZabbixApiError):
+class ZabbixApiKeyNotFoundError(ZabbixMetricsError):
     def __init__(self, host, key):
         msg = 'Host "{}" don\'t have "{}"'.format(host, key)
-        super(ZabbixApiError, self).__init__(msg)
+        super(ZabbixMetricsError, self).__init__(msg)
 
 
-class ZabbixApiNoDataBetweenTimeError(ZabbixApiError):
+class ZabbixApiNoDataBetweenTimeError(ZabbixMetricsError):
     def __init__(self, host, keys, time_from, time_till):
         msg = 'Host "{}" don\'t have "{}" between {} and {}'.format(
             host, keys, time_from, time_till
         )
-        super(ZabbixApiError, self).__init__(msg)
+        super(ZabbixMetricsError, self).__init__(msg)
 
 
 

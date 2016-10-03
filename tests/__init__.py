@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-KEY_DISK_SIZE_DATA = 'hrStorageSize[/data]'
-KEY_DISK_USED_DATA = 'hrStorageUsed[/data]'
+KEY_DISK_SIZE_DATA = 'hrStorageSizeInBytes[/data]'
+KEY_DISK_USED_DATA = 'hrStorageUsedInBytes[/data]'
 
 
 class Item(object):
