@@ -120,6 +120,28 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
                 host=instance.dns, dbtype='mysql',
                 alarm='group', clientgroup=clientgroup, **extra_parameters)
 
+    def migrate_database_monitors_flipper2fox(self, ):
+        clientgroup = self.extra_clientgroup
+        extra_parameters = self.get_database_monitors_extra_parameters()
+
+        for instance in self.secondary_ips:
+            self._delete_monitors(host=instance.dns)
+
+        self._create_database_monitors(
+            host=self.mysql_infra_dns_from_endpoint_dns, dbtype='mysql',
+            alarm='group', clientgroup=clientgroup, **extra_parameters)
+
+    def migrate_database_monitors_fox2flipper(self, ):
+        clientgroup = self.extra_clientgroup
+        extra_parameters = self.get_database_monitors_extra_parameters()
+
+        self._delete_monitors(host=self.mysql_infra_dns_from_endpoint_dns)
+
+        for instance in self.secondary_ips:
+            self._create_database_monitors(
+                host=instance.dns, dbtype='mysql',
+                alarm='group', clientgroup=clientgroup, **extra_parameters)
+
 
 class MySQLFoxHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mysql'
