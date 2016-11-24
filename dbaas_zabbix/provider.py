@@ -2,6 +2,8 @@
 import logging
 
 LOG = logging.getLogger(__name__)
+STATUS_ENABLE = 0
+STATUS_DISABLE = 1
 
 
 class ZabbixProvider(object):
@@ -89,3 +91,33 @@ class ZabbixProvider(object):
 
     def update_host_interface(self, **kwargs):
         raise NotImplementedError
+
+    def is_alarms_enabled(self):
+        hosts = []
+        for zabbix_host in self.get_zabbix_databases_hosts():
+            hosts.append(zabbix_host)
+
+        for host in self.hosts:
+            hosts.append(host.hostname)
+
+        for host in hosts:
+            triggers = self.api.trigger.get(
+                output=['status'],
+                filter={'host': host}
+            )
+
+            if not triggers:
+                LOG.warning('Host {} does not have triggers'.format(host))
+                continue
+
+            for trigger in triggers:
+                status = int(trigger['status'])
+                if status == STATUS_DISABLE:
+                    LOG.info(
+                        'Trigger {} is disabled for host {}'.format(
+                            trigger['triggerid'], host
+                        )
+                    )
+                    return False
+
+        return True
