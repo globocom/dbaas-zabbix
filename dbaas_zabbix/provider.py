@@ -101,9 +101,9 @@ class ZabbixProvider(object):
             hosts.append(host.hostname)
 
         for host in hosts:
+            host_id = self.get_host_id(host)
             triggers = self.api.trigger.get(
-                output=['status'],
-                filter={'host': host}
+                output=['status'], hostids=[host_id]
             )
 
             if not triggers:
