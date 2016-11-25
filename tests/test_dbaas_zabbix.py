@@ -348,5 +348,19 @@ class TestProviderFactory(unittest.TestCase):
 
         self.assertRaises(NotImplementedError, callableObj=call_factory)
 
+    def test_get_all_hosts_name(self):
+        databaseinfra = factory.set_up_databaseinfra(is_ha=False)
+        provider = factory_for(
+            databaseinfra=databaseinfra,
+            credentials=self.credential,
+            zabbix_api=self.zabbix_api
+        )
+        infra_hosts = (
+            [host.hostname for host in provider.hosts] +
+            provider.get_zabbix_databases_hosts()
+        )
+        provider_hosts = provider.get_all_hosts_name()
+        self.assertEqual(len(infra_hosts), len(provider_hosts))
+
     def tearDown(self):
         pass

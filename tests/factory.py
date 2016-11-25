@@ -41,6 +41,11 @@ class Driver(object):
         return self.databaseinfra.instances
 
 
+class CloudStackInfra(object):
+    def all(self):
+        return []
+
+
 class DatabaseInfra(object):
     def __init__(self, instances, environment, plan, name):
         self.instances = instances
@@ -48,6 +53,7 @@ class DatabaseInfra(object):
         self.name = name
         self.engine = Engine(name)
         self.plan = plan
+        self.cs_dbinfra_attributes = CloudStackInfra()
 
     def get_driver(self):
         if hasattr(self, 'driver'):

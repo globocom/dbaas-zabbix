@@ -95,15 +95,17 @@ class ZabbixProvider(object):
     def update_host_interface(self, **kwargs):
         raise NotImplementedError
 
-    def is_alarms_enabled(self):
+    def get_all_hosts_name(self):
         hosts = []
         for zabbix_host in self.get_zabbix_databases_hosts():
             hosts.append(zabbix_host)
 
         for host in self.hosts:
             hosts.append(host.hostname)
+        return hosts
 
-        for host in hosts:
+    def is_alarms_enabled(self):
+        for host in self.get_all_hosts_name():
             host_id = self.get_host_id(host)
             triggers = self.api.trigger.get(
                 output=['status'], hostids=[host_id]
