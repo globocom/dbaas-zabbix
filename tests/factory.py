@@ -94,7 +94,7 @@ class FakeZabbixAPI(object):
         }
         self.last_call.append(request_json)
         if method == 'host.get':
-            request_json = [{'hostid': '3309'}]
+            request_json = [{'name': 'fake', 'hostid': '3309'}]
         elif method == 'hostinterface.get':
             request_json = [{'interfaceid': '3310'}]
 

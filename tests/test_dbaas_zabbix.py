@@ -212,16 +212,22 @@ class TestZabbixApi(unittest.TestCase):
 
     def test_get_host_id(self):
         host_id = self.zabbix_provider.get_host_id(
-            host_name="fake05.test.com"
+            host_name="fake"
         )
 
         last_call = self.zabbix_provider.api.last_call[0]
         last_call_params = last_call['params']
         self.assertEquals(last_call["method"], "host.get")
         self.assertEquals(
-            last_call_params["search"]["name"], "fake05.test.com"
+            last_call_params["search"]["name"], "fake"
         )
         self.assertEqual(host_id, "3309")
+
+    def test_can_not_get_host_id(self):
+        host_id = self.zabbix_provider.get_host_id(
+            host_name="fake.wrong"
+        )
+        self.assertIsNone(host_id)
 
     def test_get_host_interface_id(self):
         host_id = self.zabbix_provider.get_host_interface_id(
