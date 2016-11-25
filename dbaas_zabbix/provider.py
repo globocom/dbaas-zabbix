@@ -71,7 +71,10 @@ class ZabbixProvider(object):
 
     def get_host_id(self, host_name):
         host_info = self._get_host_info(search={'name': host_name})
-        return host_info[0]['hostid']
+        for host in host_info:
+            if host['name'] == host_name:
+                return host['hostid']
+        return None
 
     def get_host_interface_id(self, host_id):
         host_interface = self.api.hostinterface.get(hostids=host_id)
