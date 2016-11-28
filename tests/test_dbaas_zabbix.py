@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
+from dbaas_zabbix import provider
 from dbaas_zabbix import provider_factory
 from dbaas_zabbix import database_providers
 from dbaas_zabbix import factory_for
@@ -249,6 +250,28 @@ class TestZabbixApi(unittest.TestCase):
         self.assertEquals(last_call["method"], "trigger.get")
         self.assertIsInstance(triggers, list)
         self.assertEqual(triggers, [])
+
+    def test_trigger_status(self):
+        self.assertEqual(provider.STATUS_ENABLE, 0)
+        self.assertEqual(provider.STATUS_DISABLE, 1)
+
+    def test_all_alarms_enabled(self):
+        self.zabbix_provider.api.add_trigger(provider.STATUS_ENABLE, 123)
+        self.zabbix_provider.api.add_trigger(provider.STATUS_ENABLE, 456)
+        self.zabbix_provider.api.add_trigger(provider.STATUS_ENABLE, 789)
+        self.assertTrue(self.zabbix_provider.is_alarms_enabled())
+
+    def test_all_alarms_disabled(self):
+        self.zabbix_provider.api.add_trigger(provider.STATUS_DISABLE, 123)
+        self.zabbix_provider.api.add_trigger(provider.STATUS_DISABLE, 456)
+        self.zabbix_provider.api.add_trigger(provider.STATUS_DISABLE, 789)
+        self.assertFalse(self.zabbix_provider.is_alarms_enabled())
+
+    def test_some_alarms_disabled(self):
+        self.zabbix_provider.api.add_trigger(provider.STATUS_ENABLE, 123)
+        self.zabbix_provider.api.add_trigger(provider.STATUS_DISABLE, 456)
+        self.zabbix_provider.api.add_trigger(provider.STATUS_ENABLE, 789)
+        self.assertFalse(self.zabbix_provider.is_alarms_enabled())
 
     def test_can_not_get_host_id(self):
         host_id = self.zabbix_provider.get_host_id(
