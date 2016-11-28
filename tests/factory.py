@@ -87,6 +87,7 @@ class FakeZabbixAPI(object):
         self.server = server
         self.id = id(self)
         self.last_call = []
+        self.triggers = []
 
     def login(self, user, password):
         pass
@@ -103,11 +104,16 @@ class FakeZabbixAPI(object):
             request_json = [{'name': 'fake', 'hostid': '3309'}]
         elif method == 'hostinterface.get':
             request_json = [{'interfaceid': '3310'}]
+        elif method == 'trigger.get':
+            request_json = self.triggers
 
         return request_json
 
     def __getattr__(self, attr):
         return FakeZabbixAPIObjectClass(attr, self)
+
+    def add_trigger(self, status, id):
+        self.triggers.append({'status': str(status), 'triggerid': str(id)})
 
 
 class FakeZabbixAPIObjectClass(object):

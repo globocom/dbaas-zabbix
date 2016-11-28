@@ -104,18 +104,19 @@ class ZabbixProvider(object):
             hosts.append(host.hostname)
         return hosts
 
+    def get_host_triggers(self, host_name):
+        host_id = self.get_host_id(host_name)
+        triggers = self.api.trigger.get(
+            output=['status'], hostids=[host_id]
+        )
+
+        if not triggers:
+            LOG.warning('Host {} does not have triggers'.format(host_name))
+        return triggers
+
     def is_alarms_enabled(self):
         for host in self.get_all_hosts_name():
-            host_id = self.get_host_id(host)
-            triggers = self.api.trigger.get(
-                output=['status'], hostids=[host_id]
-            )
-
-            if not triggers:
-                LOG.warning('Host {} does not have triggers'.format(host))
-                continue
-
-            for trigger in triggers:
+            for trigger in self.get_host_triggers(host):
                 status = int(trigger['status'])
                 if status == STATUS_DISABLE:
                     LOG.info(

@@ -223,6 +223,33 @@ class TestZabbixApi(unittest.TestCase):
         )
         self.assertEqual(host_id, "3309")
 
+    def test_get_triggers(self):
+        my_triggers = {'status': '1', 'triggerid': '1234'}
+        self.zabbix_provider.api.add_trigger(
+            my_triggers['status'], my_triggers['triggerid']
+        )
+
+        triggers = self.zabbix_provider.get_host_triggers(host_name="fake")
+
+        last_call = self.zabbix_provider.api.last_call[1]
+        self.assertEquals(last_call["method"], "trigger.get")
+
+        self.assertIsNotNone(triggers)
+        self.assertIsInstance(triggers, list)
+        self.assertEqual(len(triggers), 1)
+        self.assertIn('status', triggers[0])
+        self.assertIn('triggerid', triggers[0])
+        self.assertEqual(my_triggers['status'], triggers[0]['status'])
+        self.assertEqual(my_triggers['triggerid'], triggers[0]['triggerid'])
+
+    def test_get_triggers_empty(self):
+        triggers = self.zabbix_provider.get_host_triggers(host_name="fake")
+
+        last_call = self.zabbix_provider.api.last_call[1]
+        self.assertEquals(last_call["method"], "trigger.get")
+        self.assertIsInstance(triggers, list)
+        self.assertEqual(triggers, [])
+
     def test_can_not_get_host_id(self):
         host_id = self.zabbix_provider.get_host_id(
             host_name="fake.wrong"
