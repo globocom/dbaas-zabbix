@@ -80,7 +80,7 @@ class DatabaseZabbixProvider(ZabbixProvider):
 class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mysql'
     __is_ha__ = False
-    __version__ = ['5.6.15', ]
+    __version__ = ['5.6.15', '5.6.24', ]
 
     def create_database_monitors(self,):
         clientgroup = self.extra_clientgroup
