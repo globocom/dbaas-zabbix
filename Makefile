@@ -48,7 +48,8 @@ release:
 	python setup.py sdist upload
 
 release_globo:
-	python setup.py sdist upload -r ipypiglobo
+	python setup.py sdist register -r ipypiglobo
+	python setup.py sdist register -r pypiglobo
 
 fake_deploy:
 	rm -f /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/__init__.pyc
