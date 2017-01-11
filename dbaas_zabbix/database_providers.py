@@ -13,12 +13,15 @@ class DatabaseZabbixProvider(ZabbixProvider):
         self.extra_clientgroup = self.extra_clientgroup
 
     def create_basic_monitors(self, ):
-        clientgroup = self.main_clientgroup
         for host in self.hosts:
-            self._create_basic_monitors(
-                host=host.hostname, ip=host.address, clientgroup=clientgroup,
-                alarm="group", **self.get_basic_monitors_extra_parameters()
-            )
+            self.create_instance_basic_monitors(host)
+
+    def create_instance_basic_monitors(self, host):
+        clientgroup = self.main_clientgroup
+        self._create_basic_monitors(
+            host=host.hostname, ip=host.address, clientgroup=clientgroup,
+            alarm="group", **self.get_basic_monitors_extra_parameters()
+        )
 
     def get_client_groups(self,):
         clientgroup = []
@@ -37,14 +40,20 @@ class DatabaseZabbixProvider(ZabbixProvider):
 
     def delete_basic_monitors(self, ):
         for host in self.hosts:
-            self._delete_monitors(host=host.hostname)
+            self.delete_instance_monitors(host_name=host.hostname)
+
+    def delete_instance_monitors(self, host_name):
+        self._delete_monitors(host=host_name)
 
     def create_database_monitors(self, **kwargs):
         raise NotImplementedError
 
+    def create_instance_monitors(self, instance):
+        raise NotImplementedError
+
     def delete_database_monitors(self,):
         for zabbix_host in self.get_zabbix_databases_hosts():
-            self._delete_monitors(host=zabbix_host)
+            self.delete_instance_monitors(host_name=zabbix_host)
 
     def get_zabbix_databases_hosts(self,):
         zabbix_hosts = []
@@ -59,17 +68,23 @@ class DatabaseZabbixProvider(ZabbixProvider):
 
     def disable_alarms(self,):
         for host in self.hosts:
-            self._disable_alarms(host=host.hostname)
+            self.disable_alarms_to(host_name=host.hostname)
 
         for database_host in self.get_zabbix_databases_hosts():
-            self._disable_alarms(host=database_host)
+            self.disable_alarms_to(host_name=database_host)
 
     def enable_alarms(self,):
         for host in self.hosts:
-            self._enable_alarms(host=host.hostname)
+            self.enable_alarms_to(host_name=host.hostname)
 
         for database_host in self.get_zabbix_databases_hosts():
-            self._enable_alarms(host=database_host)
+            self.enable_alarms_to(host_name=database_host)
+
+    def disable_alarms_to(self, host_name):
+        return self._disable_alarms(host=host_name)
+
+    def enable_alarms_to(self, host_name):
+        return self._enable_alarms(host=host_name)
 
     def update_host_interface(self, host_name, **kwargs):
         host_id = self.get_host_id(host_name)
@@ -83,12 +98,16 @@ class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
     __version__ = ['5.6.15', '5.6.24', ]
 
     def create_database_monitors(self,):
-        clientgroup = self.extra_clientgroup
         for instance in self.instances:
-            self._create_database_monitors(
-                host=instance.dns, dbtype='mysql', alarm='group',
-                clientgroup=clientgroup,
-                **self.get_database_monitors_extra_parameters())
+            self.create_instance_monitors(instance)
+
+    def create_instance_monitors(self, instance):
+        clientgroup = self.extra_clientgroup
+        self._create_database_monitors(
+            host=instance.dns, dbtype='mysql', alarm='group',
+            clientgroup=clientgroup,
+            **self.get_database_monitors_extra_parameters()
+        )
 
 
 class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
@@ -97,9 +116,22 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __version__ = ['5.6.15', ]
 
     def create_database_monitors(self,):
+        for instance in self.database_instances:
+            self.create_instance_monitors(instance)
+
+        for instance in self.secondary_ips:
+            self.create_instance_monitors(instance)
+
+    def create_instance_monitors(self, instance):
         clientgroup = self.extra_clientgroup
         extra_parameters = self.get_database_monitors_extra_parameters()
-        for instance in self.database_instances:
+
+        if instance in self.secondary_ips:
+            self._create_database_monitors(
+                host=instance.dns, dbtype='mysql',
+                alarm='group', clientgroup=clientgroup, **extra_parameters
+            )
+        elif instance in self.database_instances:
             params = {'host': instance.dns,
                       'alarm': 'group',
                       'clientgroup': clientgroup,
@@ -115,17 +147,12 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
             params.update(extra_parameters)
             self._create_database_monitors(**params)
 
-        for instance in self.secondary_ips:
-            self._create_database_monitors(
-                host=instance.dns, dbtype='mysql',
-                alarm='group', clientgroup=clientgroup, **extra_parameters)
-
     def migrate_database_monitors_flipper2fox(self, ):
         clientgroup = self.extra_clientgroup
         extra_parameters = self.get_database_monitors_extra_parameters()
 
         for instance in self.secondary_ips:
-            self._delete_monitors(host=instance.dns)
+            self.delete_instance_monitors(host_name=instance.dns)
 
         self._create_database_monitors(
             host=self.mysql_infra_dns_from_endpoint_dns, dbtype='mysql',
@@ -135,7 +162,9 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
         clientgroup = self.extra_clientgroup
         extra_parameters = self.get_database_monitors_extra_parameters()
 
-        self._delete_monitors(host=self.mysql_infra_dns_from_endpoint_dns)
+        self.delete_instance_monitors(
+            host_name=self.mysql_infra_dns_from_endpoint_dns
+        )
 
         for instance in self.secondary_ips:
             self._create_database_monitors(
@@ -152,24 +181,29 @@ class MySQLFoxHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
         clientgroup = self.extra_clientgroup
         extra_parameters = self.get_database_monitors_extra_parameters()
         for instance in self.database_instances:
-            params = {'host': instance.dns,
-                      'alarm': 'group',
-                      'clientgroup': clientgroup,
-                      'dbtype': 'mysql',
-                      'healthcheck': {'host': instance.dns,
-                                      'port': '80',
-                                      'string': 'WORKING',
-                                      'uri': 'health-check/'},
-                      'healthcheck_monitor': {'host': instance.dns,
-                                              'port': '80',
-                                              'string': 'WORKING',
-                                              'uri': 'health-check/monitor/'}}
-            params.update(extra_parameters)
-            self._create_database_monitors(**params)
+            self.create_instance_monitors(instance)
 
         self._create_database_monitors(
             host=self.mysql_infra_dns_from_endpoint_dns, dbtype='mysql',
             alarm='group', clientgroup=clientgroup, **extra_parameters)
+
+    def create_instance_monitors(self, instance):
+        clientgroup = self.extra_clientgroup
+        extra_parameters = self.get_database_monitors_extra_parameters()
+        params = {'host': instance.dns,
+                  'alarm': 'group',
+                  'clientgroup': clientgroup,
+                  'dbtype': 'mysql',
+                  'healthcheck': {'host': instance.dns,
+                                  'port': '80',
+                                  'string': 'WORKING',
+                                  'uri': 'health-check/'},
+                  'healthcheck_monitor': {'host': instance.dns,
+                                          'port': '80',
+                                          'string': 'WORKING',
+                                          'uri': 'health-check/monitor/'}}
+        params.update(extra_parameters)
+        self._create_database_monitors(**params)
 
     def get_zabbix_databases_hosts(self,):
         zabbix_hosts = super(MySQLFoxHighAvailabilityZabbixProvider, self).get_zabbix_databases_hosts()
