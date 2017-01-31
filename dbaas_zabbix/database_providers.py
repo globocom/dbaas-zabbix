@@ -212,40 +212,6 @@ class MySQLFoxHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
         return zabbix_hosts
 
 
-class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
-    __provider_name__ = 'mongodb'
-    __is_ha__ = False
-    __version__ = ['2.4.10', ]
-
-    def create_database_monitors(self):
-        clientgroup = self.extra_clientgroup
-        for instance in self.instances:
-            self._create_database_monitors(
-                host=instance.dns, dbtype='mongodb',
-                alarm="group", clientgroup=clientgroup,
-                **self.get_database_monitors_extra_parameters())
-
-
-class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
-    __provider_name__ = 'mongodb'
-    __is_ha__ = True
-    __version__ = ['2.4.10', ]
-
-    def create_database_monitors(self,):
-        clientgroup = self.extra_clientgroup
-        for instance in self.database_instances:
-            self._create_database_monitors(
-                host=instance.dns, dbtype='mongodb',
-                alarm="group", clientgroup=clientgroup,
-                **self.get_database_monitors_extra_parameters())
-
-        for instance in self.non_database_instances:
-            self._create_database_monitors(
-                host=instance.dns, dbtype='mongodb',
-                alarm='group', clientgroup=clientgroup,
-                arbiter='1', **self.get_database_monitors_extra_parameters())
-
-
 class RedisZabbixProvider(DatabaseZabbixProvider):
 
     def get_web_monitors_extra_parameters(self,):
@@ -310,7 +276,44 @@ class RedisHighAvailabilityZabbixProvider(RedisZabbixProvider):
     __version__ = ['2.8.17', ]
 
 
-class MongoDBThreeDotZeroSingleZabbixProvider(MongoDBSingleZabbixProvider):
+class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
+    __provider_name__ = 'mongodb'
+    __is_ha__ = False
+    __version__ = ['2.4.10', ]
+
+    def create_database_monitors(self):
+        clientgroup = self.extra_clientgroup
+        for instance in self.instances:
+            self._create_database_monitors(
+                host=instance.dns, dbtype='mongodb',
+                alarm="group", clientgroup=clientgroup,
+                **self.get_database_monitors_extra_parameters())
+
+
+class MongoDBHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
+    __provider_name__ = 'mongodb'
+    __is_ha__ = True
+    __version__ = ['2.4.10', ]
+
+    def create_arbiter_monitors(self,):
+        clientgroup = self.extra_clientgroup
+        for instance in self.non_database_instances:
+            self._create_database_monitors(
+                host=instance.dns, dbtype='mongodb',
+                alarm='group', clientgroup=clientgroup,
+                arbiter='1', **self.get_database_monitors_extra_parameters())
+
+    def create_database_monitors(self,):
+        clientgroup = self.extra_clientgroup
+        for instance in self.database_instances:
+            self._create_database_monitors(
+                host=instance.dns, dbtype='mongodb',
+                alarm="group", clientgroup=clientgroup,
+                **self.get_database_monitors_extra_parameters())
+        self.create_arbiter_monitors()
+
+
+class MongoDBThreeDotZeroSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = False
     __version__ = ['3.0.12', ]
@@ -332,6 +335,15 @@ class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
     __is_ha__ = True
     __version__ = ['3.0.12', ]
 
+    def create_arbiter_monitors(self,):
+        clientgroup = self.get_client_groups()
+        for instance in self.non_database_instances:
+            self._create_tcp_monitors(
+                host=instance.dns, port=str(instance.port), alarm='group',
+                clientgroup=clientgroup,
+                **self.get_database_monitors_extra_parameters()
+            )
+
     def create_database_monitors(self,):
         clientgroup = self.extra_clientgroup
         for instance in self.database_instances:
@@ -340,14 +352,7 @@ class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
                 replicaset="1", clientgroup=clientgroup,
                 **self.get_database_monitors_extra_parameters()
             )
-
-        clientgroup = self.get_client_groups()
-        for instance in self.non_database_instances:
-            self._create_tcp_monitors(
-                host=instance.dns, port=str(instance.port), alarm='group',
-                clientgroup=clientgroup,
-                **self.get_database_monitors_extra_parameters()
-            )
+        self.create_arbiter_monitors()
 
     def get_zabbix_databases_hosts(self,):
         zabbix_hosts = []
@@ -358,6 +363,41 @@ class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
             zabbix_hosts.append(host)
 
         return zabbix_hosts
+
+
+class MongoDBThreeDotFourSingleZabbixProvider(DatabaseZabbixProvider):
+    __provider_name__ = 'mongodb'
+    __is_ha__ = False
+    __version__ = ['3.4.1', ]
+
+    def create_database_monitors(self,):
+        clientgroup = self.extra_clientgroup
+        for instance in self.database_instances:
+            self._create_mongo_three_monitors(
+                host=instance.dns, alarm="group",
+                replicaset="0", clientgroup=clientgroup,
+                mongo_version="3.4",
+                **self.get_database_monitors_extra_parameters()
+            )
+
+
+class MongoDBThreeDotFourHighAvailabilityZabbixProvider(
+    MongoDBThreeDotZeroHighAvailabilityZabbixProvider
+):
+    __provider_name__ = 'mongodb'
+    __is_ha__ = True
+    __version__ = ['3.4.1', ]
+
+    def create_database_monitors(self,):
+        clientgroup = self.extra_clientgroup
+        for instance in self.database_instances:
+            self._create_mongo_three_monitors(
+                host=instance.dns, alarm="group",
+                replicaset="1", clientgroup=clientgroup,
+                mongo_version="3.4",
+                **self.get_database_monitors_extra_parameters()
+            )
+        self.create_arbiter_monitors()
 
 
 class FakeSingleZabbixProvider(DatabaseZabbixProvider):
