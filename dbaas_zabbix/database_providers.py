@@ -267,13 +267,13 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
 class RedisSingleZabbixProvider(RedisZabbixProvider):
     __provider_name__ = 'redis'
     __is_ha__ = False
-    __version__ = ['2.8.17', ]
+    __version__ = ['2.8.17', '3.2.6']
 
 
 class RedisHighAvailabilityZabbixProvider(RedisZabbixProvider):
     __provider_name__ = 'redis'
     __is_ha__ = True
-    __version__ = ['2.8.17', ]
+    __version__ = ['2.8.17', '3.2.6']
 
 
 class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
