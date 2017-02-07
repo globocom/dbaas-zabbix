@@ -398,15 +398,28 @@ class MongoDBThreeDotFourHighAvailabilityZabbixProvider(
     __version__ = ['3.4.1', ]
 
     def create_database_monitors(self,):
-        clientgroup = self.extra_clientgroup
         for instance in self.database_instances:
+            self.create_instance_monitors(instance)
+
+        for instance in self.non_database_instances:
+            self.create_instance_monitors(instance)
+
+    def create_instance_monitors(self, instance):
+        clientgroup = self.extra_clientgroup
+
+        if instance in self.database_instances:
             self._create_mongo_three_monitors(
                 host=instance.dns, alarm="group",
                 replicaset="1", clientgroup=clientgroup,
                 mongo_version="3.4",
                 **self.get_database_monitors_extra_parameters()
             )
-        self.create_arbiter_monitors()
+        elif instance in self.non_database_instances:
+            self._create_tcp_monitors(
+                host=instance.dns, port=str(instance.port), alarm='group',
+                clientgroup=clientgroup,
+                **self.get_database_monitors_extra_parameters()
+            )
 
 
 class FakeSingleZabbixProvider(DatabaseZabbixProvider):
