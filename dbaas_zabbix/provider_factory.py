@@ -16,9 +16,21 @@ class ProviderFactory(object):
 
     @classmethod
     def factory(cls, dbaas_api, **kwargs):
-        driver_class = cls.get_provider_class(dbaas_api.engine_name,
-                                              dbaas_api.is_ha,
-                                              dbaas_api.engine_version)
+        engine_name = dbaas_api.engine_name
+        is_ha = dbaas_api.is_ha
+        engine_version = dbaas_api.engine_version
+        if kwargs.get('engine_name'):
+            engine_name = kwargs.get('engine_name')
+            del kwargs['engine_name']
+        if kwargs.get('is_ha'):
+            is_ha = kwargs.get('is_ha')
+            del kwargs['is_ha']
+        if kwargs.get('engine_version'):
+            engine_version = kwargs.get('engine_version')
+            del kwargs['engine_version']
+        driver_class = cls.get_provider_class(engine_name,
+                                              is_ha,
+                                              engine_version)
         return driver_class(dbaas_api=dbaas_api, **kwargs)
 
 
