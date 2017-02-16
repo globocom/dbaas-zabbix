@@ -218,8 +218,16 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
         return self.extra_parameters('create_web_monitors')
 
     def create_database_monitors(self,):
+        for instance in self.database_instances:
+            self.create_instance_monitors(instance)
+
+        for instance in self.non_database_instances:
+            self.create_instance_monitors(instance)
+
+    def create_instance_monitors(self, instance):
         clientgroup = self.get_client_groups()
         extra_parameters = self.get_web_monitors_extra_parameters()
+        hc_url = "http://{}:80"
 
         notes = self.alarm_notes
         params = {
@@ -230,8 +238,7 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
         }
         params.update(extra_parameters)
 
-        hc_url = "http://{}:80"
-        for instance in self.database_instances:
+        if instance in self.database_instances:
             custom_hc_url = hc_url.format(instance.dns)
 
             params["url"] = "{}/health-check/redis-con/".format(custom_hc_url)
@@ -240,7 +247,7 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             params["url"] = "{}/health-check/redis-mem/".format(custom_hc_url)
             self._create_web_monitors(**params)
 
-        for instance in self.non_database_instances:
+        if instance in self.non_database_instances:
             custom_hc_url = hc_url.format(instance.dns)
             params["url"] = "{}/health-check/sentinel-con/".format(
                 custom_hc_url
