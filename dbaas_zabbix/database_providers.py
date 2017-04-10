@@ -293,12 +293,18 @@ class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
             self.create_instance_monitors(instance)
 
         for instance in self.non_database_instances:
+            self.create_instance_monitors(instance)
+
+    def create_instance_monitors(self, instance):
+        if instance in self.database_instances:
+            self.create_mongodb_monitors(instance)
+        elif instance in self.non_database_instances:
             self.create_arbiter_monitors(instance)
 
     def create_arbiter_monitors(self, instance):
         pass
 
-    def create_instance_monitors(self, instance):
+    def create_mongodb_monitors(self, instance):
         clientgroup = self.extra_clientgroup
         self._create_database_monitors(
             host=instance.dns, dbtype='mongodb',
@@ -311,7 +317,7 @@ class MongoDBThreeDotZeroSingleZabbixProvider(MongoDBSingleZabbixProvider):
     __is_ha__ = False
     __version__ = ['3.0.12', ]
 
-    def create_instance_monitors(self, instance):
+    def create_mongodb_monitors(self, instance):
         clientgroup = self.extra_clientgroup
         self._create_mongo_three_monitors(
             host=instance.dns, alarm="group",
@@ -325,7 +331,7 @@ class MongoDBThreeDotFourSingleZabbixProvider(MongoDBThreeDotZeroSingleZabbixPro
     __is_ha__ = False
     __version__ = ['3.4.1', ]
 
-    def create_instance_monitors(self, instance):
+    def create_mongodb_monitors(self, instance):
         clientgroup = self.extra_clientgroup
         self._create_mongo_three_monitors(
             host=instance.dns, alarm="group",
@@ -363,7 +369,7 @@ class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
             **self.get_database_monitors_extra_parameters()
         )
 
-    def create_instance_monitors(self, instance):
+    def create_mongodb_monitors(self, instance):
         clientgroup = self.extra_clientgroup
         self._create_mongo_three_monitors(
             host=instance.dns, alarm="group",
@@ -389,7 +395,7 @@ class MongoDBThreeDotFourHighAvailabilityZabbixProvider(
     __is_ha__ = True
     __version__ = ['3.4.1', ]
 
-    def create_instance_monitors(self, instance):
+    def create_mongodb_monitors(self, instance):
         clientgroup = self.extra_clientgroup
         self._create_mongo_three_monitors(
             host=instance.dns, alarm="group",
