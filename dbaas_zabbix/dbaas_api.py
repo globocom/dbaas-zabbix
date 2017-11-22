@@ -19,12 +19,12 @@ class DatabaseAsAServiceApi(object):
         return self.credentials.endpoint
 
     @property
-    def main_clientgroup(self):
-        return self.credentials.get_parameter_by_name("main_clientgroup")
+    def client_group_host(self):
+        return self.extra_parameters("group_host").values()
 
     @property
-    def extra_clientgroup(self):
-        return self.credentials.get_parameter_by_name("extra_clientgroup")
+    def client_group_database(self):
+        return self.extra_parameters("group_database").values()
 
     def extra_parameters(self, group):
         return self.credentials.get_parameters_by_group(group)

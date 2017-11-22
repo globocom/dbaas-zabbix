@@ -6,6 +6,17 @@ STATUS_ENABLE = 0
 STATUS_DISABLE = 1
 
 
+def set_client_group(attribute):
+    def decorator(method):
+        def wrapper(*args, **kwargs):
+            kwargs["clientgroup"] = getattr(args[0].dbaas_api, attribute)
+            return method(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
 class ZabbixProvider(object):
     __provider_name__ = None
     __is_ha__ = None
@@ -29,21 +40,29 @@ class ZabbixProvider(object):
         LOG.info("Destroying monitor for host: {}".format(host))
         return self.api.globo.deleteMonitors(host)
 
+    @set_client_group("client_group_host")
     def _create_basic_monitors(self, **kwargs):
         LOG.info("Creating basic monitor with params: {}".format(kwargs))
         return self.api.globo.createBasicMonitors(**kwargs)
 
+    @set_client_group("client_group_database")
     def _create_database_monitors(self, **kwargs):
         LOG.info("Creating database monitor with params: {}".format(kwargs))
         return self.api.globo.createDBMonitors(**kwargs)
 
+    @set_client_group("client_group_database")
     def _create_mongo_three_monitors(self, **kwargs):
         LOG.info("Creating mongo3 monitor with params: {}".format(kwargs))
         return self.api.globo.createMongo3Monitors(**kwargs)
 
+    @set_client_group("client_group_database")
     def _create_web_monitors(self, **kwargs):
         LOG.info("Creating web monitor with params: {}".format(kwargs))
         return self.api.globo.createWebMonitors(**kwargs)
+
+    @set_client_group("client_group_database")
+    def _create_tcp_monitors(self, **kwargs):
+        return self.api.globo.createTCPMonitors(**kwargs)
 
     def _get_host_info(self, **kwargs):
         return self.api.host.get(**kwargs)
@@ -65,9 +84,6 @@ class ZabbixProvider(object):
 
     def _enable_alarms(self, **kwargs):
         return self.api.globo.enableAlarms(**kwargs)
-
-    def _create_tcp_monitors(self, **kwargs):
-        return self.api.globo.createTCPMonitors(**kwargs)
 
     def get_host_id(self, host_name):
         host_info = self._get_host_info(search={'name': host_name})

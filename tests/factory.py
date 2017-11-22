@@ -148,4 +148,18 @@ class FakeCredential(object):
             return ''
 
         def get_parameters_by_group(self, group_name):
+            if group_name == "group_host":
+                return {
+                    "support": "ZabbixSupport",
+                    "grafana": "GrafanaTeam",
+                    "graphite": "GraphiteGroup"
+                }
+
+            if group_name == "group_database":
+                return {
+                    "dbproduction": "DBA Team",
+                    "grafana": "GrafanaTeam",
+                    "dbaasmetrics": "DBaaS/Metrics"
+                }
+
             return {}

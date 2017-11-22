@@ -58,7 +58,7 @@ class TestZabbixApi(unittest.TestCase):
             ip = params.get('ip')
             hostname = params.get('host')
             clientgroup = params.get('clientgroup')
-            provider_clientgroup = self.zabbix_provider.main_clientgroup
+            provider_clientgroup = self.zabbix_provider.dbaas_api.client_group_host
             method_called = call.get('method')
 
             self.assertEqual(ip, host.address)
@@ -108,7 +108,7 @@ class TestZabbixApi(unittest.TestCase):
                       "port": "80", "regexp": "WORKING",
                       "uri": "/health-check/redis-con/", "var": "redis-con",
                       "alarm": "yes", "notes": dbinfra_name,
-                      "clientgroup": [1, 2]}
+                      "clientgroup": self.dbaas_api.client_group_database}
 
             self.zabbix_provider._create_web_monitors(**params)
         self.asset_create_web_monitors(instances, params)
