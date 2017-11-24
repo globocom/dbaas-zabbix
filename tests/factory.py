@@ -144,7 +144,14 @@ class FakeCredential(object):
             self.password = ''
             self.endpoint = ''
 
+        @property
+        def slack_notification(self):
+            return None
+
         def get_parameter_by_name(self, name):
+            if "slack_notification":
+                return self.slack_notification
+
             return ''
 
         def get_parameters_by_group(self, group_name):
@@ -163,3 +170,10 @@ class FakeCredential(object):
                 }
 
             return {}
+
+
+class FakeCredentialWithSlack(FakeCredential):
+
+        @property
+        def slack_notification(self):
+            return "@user,#channel"

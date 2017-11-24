@@ -76,3 +76,7 @@ class DatabaseAsAServiceApi(object):
     @property
     def engine_version(self):
         return self.databaseinfra.engine.version
+
+    @property
+    def slack_notification(self):
+        return self.credentials.get_parameter_by_name("slack_notification")

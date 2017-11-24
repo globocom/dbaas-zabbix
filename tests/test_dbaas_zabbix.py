@@ -34,11 +34,17 @@ class TestDatabaseAsAServiceApi(unittest.TestCase):
 
 
 class TestZabbixApi(unittest.TestCase):
+
+    @property
+    def credential(self):
+        return factory.FakeCredential()
+
     def setUp(self):
         self.databaseinfra = factory.set_up_databaseinfra()
         self.zabbix_api = factory.FakeZabbixAPI
         self.dbaas_api = DatabaseAsAServiceApi(
-            self.databaseinfra, factory.FakeCredential())
+            self.databaseinfra, self.credential
+        )
         self.zabbix_provider = factory.FakeDatabaseZabbixProvider(
             self.dbaas_api, self.zabbix_api
         )
@@ -65,6 +71,7 @@ class TestZabbixApi(unittest.TestCase):
             self.assertEqual(hostname, host.hostname)
             self.assertEqual(clientgroup, provider_clientgroup)
             self.assertEqual(method_called, method)
+            self.assertNotIn("notification_slack", params)
 
     def test_delete_monitors(self):
         self.zabbix_provider.delete_basic_monitors()
@@ -118,6 +125,10 @@ class TestZabbixApi(unittest.TestCase):
         for index, instance in enumerate(instances):
             last_call = self.zabbix_provider.api.last_call[index]
             last_call_params = last_call['params']
+
+            self.assert_slack(last_call_params)
+            last_call_params.pop("notification_slack", None)
+
             params['address'] = instance.dns
 
             self.assertEqual(last_call['method'], method)
@@ -182,6 +193,7 @@ class TestZabbixApi(unittest.TestCase):
         self.assertEquals(last_call_params["alarm"], 'group')
         self.assertEquals(last_call_params["host"], 'fake01.test.com')
         self.assertEquals(last_call["method"], "globo.createDBMonitors")
+        self.assert_slack(last_call_params)
 
     def test_create_mongo_three_monitors(self):
         self.zabbix_provider._create_mongo_three_monitors(
@@ -194,6 +206,7 @@ class TestZabbixApi(unittest.TestCase):
         self.assertEquals(last_call_params["alarm"], 'group')
         self.assertEquals(last_call_params["host"], 'fake02.test.com')
         self.assertEquals(last_call["method"], "globo.createMongo3Monitors")
+        self.assert_slack(last_call_params)
 
     def test_update_host_interface(self):
         self.zabbix_provider._update_host_interface(hostid="2133")
@@ -318,6 +331,15 @@ class TestZabbixApi(unittest.TestCase):
         self.assertEquals(last_call_params["port"], 9003)
         self.assertEquals(last_call_params["host"], 'fake07.test.com')
         self.assertEquals(last_call["method"], "globo.createTCPMonitors")
+        self.assert_slack(last_call_params)
+
+    def assert_slack(self, params_call):
+        slack = self.zabbix_provider.dbaas_api.slack_notification
+        if not slack:
+            self.assertNotIn("notification_slack", params_call)
+        else:
+            self.assertIn("notification_slack", params_call)
+            self.assertEqual(params_call["notification_slack"], slack)
 
     def tearDown(self):
         pass
@@ -414,3 +436,10 @@ class TestProviderFactory(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+
+class TestProviderFactorySlack(TestZabbixApi):
+
+    @property
+    def credential(self):
+        return factory.FakeCredentialWithSlack()

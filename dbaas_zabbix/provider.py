@@ -9,7 +9,22 @@ STATUS_DISABLE = 1
 def set_client_group(attribute):
     def decorator(method):
         def wrapper(*args, **kwargs):
-            kwargs["clientgroup"] = getattr(args[0].dbaas_api, attribute)
+            self = args[0]
+            kwargs["clientgroup"] = getattr(self.dbaas_api, attribute)
+            return method(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def set_slack_notification():
+    def decorator(method):
+        def wrapper(*args, **kwargs):
+            self = args[0]
+            notification_to = self.dbaas_api.slack_notification
+            if notification_to:
+                kwargs["notification_slack"] = notification_to
             return method(*args, **kwargs)
 
         return wrapper
@@ -46,21 +61,25 @@ class ZabbixProvider(object):
         return self.api.globo.createBasicMonitors(**kwargs)
 
     @set_client_group("client_group_database")
+    @set_slack_notification()
     def _create_database_monitors(self, **kwargs):
         LOG.info("Creating database monitor with params: {}".format(kwargs))
         return self.api.globo.createDBMonitors(**kwargs)
 
     @set_client_group("client_group_database")
+    @set_slack_notification()
     def _create_mongo_three_monitors(self, **kwargs):
         LOG.info("Creating mongo3 monitor with params: {}".format(kwargs))
         return self.api.globo.createMongo3Monitors(**kwargs)
 
     @set_client_group("client_group_database")
+    @set_slack_notification()
     def _create_web_monitors(self, **kwargs):
         LOG.info("Creating web monitor with params: {}".format(kwargs))
         return self.api.globo.createWebMonitors(**kwargs)
 
     @set_client_group("client_group_database")
+    @set_slack_notification()
     def _create_tcp_monitors(self, **kwargs):
         return self.api.globo.createTCPMonitors(**kwargs)
 
