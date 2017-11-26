@@ -64,7 +64,7 @@ class TestZabbixApi(unittest.TestCase):
             ip = params.get('ip')
             hostname = params.get('host')
             clientgroup = params.get('clientgroup')
-            provider_clientgroup = self.zabbix_provider.dbaas_api.client_group_host
+            provider_clientgroup = list(self.zabbix_provider.dbaas_api.client_group_host)
             method_called = call.get('method')
 
             self.assertEqual(ip, host.address)
