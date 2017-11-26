@@ -69,7 +69,7 @@ class TestZabbixApi(unittest.TestCase):
 
             self.assertEqual(ip, host.address)
             self.assertEqual(hostname, host.hostname)
-            self.assertListEqual(clientgroup, provider_clientgroup)
+            self.assertEquals(clientgroup, provider_clientgroup)
             self.assertEqual(method_called, method)
             self.assertNotIn("notification_slack", params)
 

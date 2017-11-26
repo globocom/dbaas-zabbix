@@ -10,7 +10,7 @@ def set_client_group(attribute):
     def decorator(method):
         def wrapper(*args, **kwargs):
             self = args[0]
-            kwargs["clientgroup"] = getattr(self.dbaas_api, attribute)
+            kwargs["clientgroup"] = list(getattr(self.dbaas_api, attribute))
             return method(*args, **kwargs)
 
         return wrapper
