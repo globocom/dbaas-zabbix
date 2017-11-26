@@ -20,11 +20,11 @@ class DatabaseAsAServiceApi(object):
 
     @property
     def client_group_host(self):
-        return self.extra_parameters("group_host").values()
+        return list(self.extra_parameters("group_host").values())
 
     @property
     def client_group_database(self):
-        return self.extra_parameters("group_database").values()
+        return list(self.extra_parameters("group_database").values())
 
     def extra_parameters(self, group):
         return self.credentials.get_parameters_by_group(group)
