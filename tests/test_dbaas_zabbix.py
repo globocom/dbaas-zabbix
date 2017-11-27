@@ -333,6 +333,19 @@ class TestZabbixApi(unittest.TestCase):
         self.assertEquals(last_call["method"], "globo.createTCPMonitors")
         self.assert_slack(last_call_params)
 
+    def test_create_redis_monitors(self):
+        self.zabbix_provider._create_redis_monitors(
+            host='fake08.redis.com', password="StrongPWD123",
+            port=6379, alarm='yes', notes='Get in touch with me',
+        )
+
+        last_call = self.zabbix_provider.api.last_call[0]
+        last_call_params = last_call['params']
+        self.assertEquals(last_call_params["port"], 6379)
+        self.assertEquals(last_call_params["host"], 'fake08.redis.com')
+        self.assertEquals(last_call["method"], "globo.createRedisMonitors")
+        self.assert_slack(last_call_params)
+
     def assert_slack(self, params_call):
         slack = self.zabbix_provider.dbaas_api.slack_notification
         if not slack:

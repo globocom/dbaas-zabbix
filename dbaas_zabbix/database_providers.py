@@ -222,6 +222,13 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             params["url"] = "{}/health-check/redis-mem/".format(custom_hc_url)
             self._create_web_monitors(**params)
 
+            self._create_redis_monitors(
+                host=instance.dns, password=instance.databaseinfra.password,
+                port=str(instance.port), alarm='yes', notes=notes,
+                **self.get_database_monitors_extra_parameters()
+            )
+
+
         if instance in self.non_database_instances:
             custom_hc_url = hc_url.format(instance.dns)
             params["url"] = "{}/health-check/sentinel-con/".format(
@@ -237,6 +244,8 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             host = "web_{}{}redis-con/".format(instance.dns, suffix)
             zabbix_hosts.append(host)
             host = "web_{}{}redis-mem/".format(instance.dns, suffix)
+            zabbix_hosts.append(host)
+            host = "redis_{}:{}".format(instance.dns, instance.port)
             zabbix_hosts.append(host)
 
         for instance in self.non_database_instances:

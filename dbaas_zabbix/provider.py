@@ -83,6 +83,11 @@ class ZabbixProvider(object):
     def _create_tcp_monitors(self, **kwargs):
         return self.api.globo.createTCPMonitors(**kwargs)
 
+    @set_client_group("client_group_database")
+    @set_slack_notification()
+    def _create_redis_monitors(self, **kwargs):
+        return self.api.globo.createRedisMonitors(**kwargs)
+
     def _get_host_info(self, **kwargs):
         return self.api.host.get(**kwargs)
 
