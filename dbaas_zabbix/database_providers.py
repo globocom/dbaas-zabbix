@@ -350,7 +350,7 @@ class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
     def create_mongodb_monitors(self, instance):
         self._create_mongo_three_monitors(
             host=instance.dns, alarm="group",
-            replicaset="1" **self.get_database_monitors_extra_parameters()
+            replicaset="1", **self.get_database_monitors_extra_parameters()
         )
 
     def get_zabbix_databases_hosts(self,):
