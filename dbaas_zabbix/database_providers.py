@@ -80,7 +80,7 @@ class DatabaseZabbixProvider(ZabbixProvider):
 class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mysql'
     __is_ha__ = False
-    __version__ = ['5.6.15', '5.6.24', '5.7.21']
+    __version__ = ['5.6.15', '5.6.24', '5.6.40', '5.7.21']
 
     def create_database_monitors(self,):
         for instance in self.instances:
@@ -96,7 +96,7 @@ class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
 class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mysql'
     __is_ha__ = True
-    __version__ = ['5.6.15', ]
+    __version__ = ['5.6.15', '5.6.40']
 
     def create_database_monitors(self,):
         for instance in self.database_instances:
