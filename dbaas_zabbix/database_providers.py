@@ -155,7 +155,7 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
 class MySQLFoxHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mysql'
     __is_ha__ = True
-    __version__ = ['5.6.24', '5.7.21']
+    __version__ = ['5.6.24', '5.6.40', '5.7.21']
 
     def create_database_monitors(self,):
         extra_parameters = self.get_database_monitors_extra_parameters()
