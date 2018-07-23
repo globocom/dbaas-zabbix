@@ -46,9 +46,6 @@ class DatabaseZabbixProvider(ZabbixProvider):
         for instance in self.instances:
             zabbix_hosts.append(instance.dns)
 
-        for instance in self.secondary_ips:
-            zabbix_hosts.append(instance.dns)
-
         return zabbix_hosts
 
     def disable_alarms(self,):
@@ -102,18 +99,10 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
         for instance in self.database_instances:
             self.create_instance_monitors(instance)
 
-        for instance in self.secondary_ips:
-            self.create_instance_monitors(instance)
-
     def create_instance_monitors(self, instance):
         extra_parameters = self.get_database_monitors_extra_parameters()
 
-        if instance in self.secondary_ips:
-            self._create_database_monitors(
-                host=instance.dns, dbtype='mysql',
-                alarm='group', **extra_parameters
-            )
-        elif instance in self.database_instances:
+        if instance in self.database_instances:
             params = {'host': instance.dns,
                       'alarm': 'group',
                       'dbtype': 'mysql',
@@ -130,9 +119,6 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
 
     def migrate_database_monitors_flipper2fox(self, ):
         extra_parameters = self.get_database_monitors_extra_parameters()
-        for instance in self.secondary_ips:
-            self.delete_instance_monitors(host_name=instance.dns)
-
         self._create_database_monitors(
             host=self.mysql_infra_dns_from_endpoint_dns, dbtype='mysql',
             alarm='group', **extra_parameters
@@ -144,12 +130,6 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
         self.delete_instance_monitors(
             host_name=self.mysql_infra_dns_from_endpoint_dns
         )
-
-        for instance in self.secondary_ips:
-            self._create_database_monitors(
-                host=instance.dns, dbtype='mysql',
-                alarm='group', **extra_parameters
-            )
 
 
 class MySQLFoxHighAvailabilityZabbixProvider(DatabaseZabbixProvider):

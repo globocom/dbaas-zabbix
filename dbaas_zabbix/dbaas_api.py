@@ -66,10 +66,6 @@ class DatabaseAsAServiceApi(object):
         return self.databaseinfra.endpoint_dns.split(':')[0]
 
     @property
-    def secondary_ips(self):
-        return self.databaseinfra.cs_dbinfra_attributes.all()
-
-    @property
     def is_ha(self):
         return self.databaseinfra.plan.is_ha
 
