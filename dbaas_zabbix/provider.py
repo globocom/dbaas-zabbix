@@ -10,7 +10,7 @@ def set_client_group(attribute):
     def decorator(method):
         def wrapper(*args, **kwargs):
             self = args[0]
-            kwargs["clientgroup"] = list(getattr(self.dbaas_api, attribute))
+            kwargs["hostgroups"] = list(getattr(self.dbaas_api, attribute))
             return method(*args, **kwargs)
 
         return wrapper
@@ -58,7 +58,7 @@ class ZabbixProvider(object):
     @set_client_group("client_group_host")
     def _create_basic_monitors(self, **kwargs):
         LOG.info("Creating basic monitor with params: {}".format(kwargs))
-        return self.api.globo.createBasicMonitors(**kwargs)
+        return self.api.globo.createLinuxMonitors(**kwargs)
 
     @set_client_group("client_group_database")
     @set_slack_notification()

@@ -14,7 +14,7 @@ class DatabaseZabbixProvider(ZabbixProvider):
     def create_instance_basic_monitors(self, host):
         self._create_basic_monitors(
             host=host.hostname, ip=host.address,
-            alarm="group", **self.get_basic_monitors_extra_parameters()
+            alarm="yes", **self.get_basic_monitors_extra_parameters()
         )
 
     def get_basic_monitors_extra_parameters(self):
@@ -85,7 +85,7 @@ class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
 
     def create_instance_monitors(self, instance):
         self._create_database_monitors(
-            host=instance.dns, dbtype='mysql', alarm='group',
+            host=instance.dns, dbtype='mysql', alarm='yes',
             **self.get_database_monitors_extra_parameters()
         )
 
@@ -104,7 +104,7 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
 
         if instance in self.database_instances:
             params = {'host': instance.dns,
-                      'alarm': 'group',
+                      'alarm': 'yes',
                       'dbtype': 'mysql',
                       'healthcheck': {'host': instance.dns,
                                       'port': '80',
@@ -121,7 +121,7 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
         extra_parameters = self.get_database_monitors_extra_parameters()
         self._create_database_monitors(
             host=self.mysql_infra_dns_from_endpoint_dns, dbtype='mysql',
-            alarm='group', **extra_parameters
+            alarm='yes', **extra_parameters
         )
 
     def migrate_database_monitors_fox2flipper(self, ):
@@ -142,14 +142,17 @@ class MySQLFoxHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
         for instance in self.database_instances:
             self.create_instance_monitors(instance)
 
+        LOG.info('RICK01 - mysql_infra_dns_from_endpoint_dns')
+        LOG.info("{}, {}, {}".format(
+            self.mysql_infra_dns_from_endpoint_dns, extra_parameters))
         self._create_database_monitors(
             host=self.mysql_infra_dns_from_endpoint_dns, dbtype='mysql',
-            alarm='group', **extra_parameters)
+            alarm='yes', **extra_parameters)
 
     def create_instance_monitors(self, instance):
         extra_parameters = self.get_database_monitors_extra_parameters()
         params = {'host': instance.dns,
-                  'alarm': 'group',
+                  'alarm': 'yes',
                   'dbtype': 'mysql',
                   'healthcheck': {'host': instance.dns,
                                   'port': '80',
@@ -189,11 +192,14 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
         params = {
             "notes": notes,
             "required_string": "WORKING",
-            "alarm": "group",
+            "alarm": "yes",
+            "doc": notes,
+            "project": "dbaas",
         }
         params.update(extra_parameters)
 
         if instance in self.database_instances:
+            params["webserver"] = instance.dns
             custom_hc_url = hc_url.format(instance.dns)
 
             params["url"] = "{}/health-check/redis-con/".format(custom_hc_url)
@@ -211,6 +217,7 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
 
 
         if instance in self.non_database_instances:
+            params["webserver"] = instance.dns
             custom_hc_url = hc_url.format(instance.dns)
             params["url"] = "{}/health-check/sentinel-con/".format(
                 custom_hc_url
@@ -272,7 +279,7 @@ class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
     def create_mongodb_monitors(self, instance):
         self._create_database_monitors(
             host=instance.dns, dbtype='mongodb',
-            alarm="group", **self.get_database_monitors_extra_parameters()
+            alarm="yes", **self.get_database_monitors_extra_parameters()
         )
 
 
@@ -283,7 +290,7 @@ class MongoDBThreeDotZeroSingleZabbixProvider(MongoDBSingleZabbixProvider):
 
     def create_mongodb_monitors(self, instance):
         self._create_mongo_three_monitors(
-            host=instance.dns, alarm="group",
+            host=instance.dns, alarm="yes", doc=self.alarm_notes,
             replicaset="0", **self.get_database_monitors_extra_parameters()
         )
 
@@ -295,7 +302,7 @@ class MongoDBThreeDotFourSingleZabbixProvider(MongoDBThreeDotZeroSingleZabbixPro
 
     def create_mongodb_monitors(self, instance):
         self._create_mongo_three_monitors(
-            host=instance.dns, alarm="group",
+            host=instance.dns, alarm="yes", doc=self.alarm_notes,
             replicaset="0", mongo_version="3.4",
             **self.get_database_monitors_extra_parameters()
         )
@@ -309,7 +316,7 @@ class MongoDBHighAvailabilityZabbixProvider(MongoDBSingleZabbixProvider):
     def create_arbiter_monitors(self, instance):
         self._create_database_monitors(
             host=instance.dns, dbtype='mongodb',
-            alarm='group', arbiter='1',
+            alarm='yes', arbiter='1',
             **self.get_database_monitors_extra_parameters()
         )
 
@@ -323,13 +330,13 @@ class MongoDBThreeDotZeroHighAvailabilityZabbixProvider(
 
     def create_arbiter_monitors(self, instance):
         self._create_tcp_monitors(
-            host=instance.dns, port=str(instance.port), alarm='group',
+            host=instance.dns, port=str(instance.port), alarm='yes',
             **self.get_database_monitors_extra_parameters()
         )
 
     def create_mongodb_monitors(self, instance):
         self._create_mongo_three_monitors(
-            host=instance.dns, alarm="group",
+            host=instance.dns, alarm="yes", doc=self.alarm_notes,
             replicaset="1", **self.get_database_monitors_extra_parameters()
         )
 
@@ -353,7 +360,7 @@ class MongoDBThreeDotFourHighAvailabilityZabbixProvider(
 
     def create_mongodb_monitors(self, instance):
         self._create_mongo_three_monitors(
-            host=instance.dns, alarm="group",
+            host=instance.dns, alarm="yes", doc=self.alarm_notes,
             replicaset="1", mongo_version="3.4",
             **self.get_database_monitors_extra_parameters()
         )
@@ -364,7 +371,7 @@ class FakeSingleZabbixProvider(DatabaseZabbixProvider):
     __is_ha__ = False
     __version__ = ['0.0.0', ]
 
-    def create_database_monitors(self, alarm='group'):
+    def create_database_monitors(self, alarm='yes'):
         instances = self.instances
         self._create_database_monitors(instances, dbtype='fake', alarm=alarm)
 
@@ -374,6 +381,6 @@ class FakeHAZabbixProvider(DatabaseZabbixProvider):
     __is_ha__ = True
     __version__ = ['1.1.1', ]
 
-    def create_database_monitors(self, alarm='group'):
+    def create_database_monitors(self, alarm='yes'):
         instances = self.instances
         self._create_database_monitors(instances, dbtype='fake', alarm=alarm)
