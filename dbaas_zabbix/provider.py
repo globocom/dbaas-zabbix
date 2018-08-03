@@ -109,6 +109,9 @@ class ZabbixProvider(object):
     def _enable_alarms(self, **kwargs):
         return self.api.globo.enableAlarms(**kwargs)
 
+    def _get_monitors(self, **kwargs):
+        return self.api.globo.getMonitors(**kwargs)
+
     def get_host_id(self, host_name):
         host_info = self._get_host_info(search={'name': host_name})
         for host in host_info:
