@@ -55,7 +55,7 @@ class TestZabbixApi(unittest.TestCase):
         self.assert_create_basic_monitor_call(last_calls)
 
     def assert_create_basic_monitor_call(self, last_calls):
-        method = 'globo.createBasicMonitors'
+        method = 'globo.createLinuxMonitors'
         hosts = self.zabbix_provider.hosts
         for index, call in enumerate(last_calls):
             params = call.get('params')
@@ -63,13 +63,13 @@ class TestZabbixApi(unittest.TestCase):
 
             ip = params.get('ip')
             hostname = params.get('host')
-            clientgroup = params.get('clientgroup')
-            provider_clientgroup = self.zabbix_provider.dbaas_api.client_group_host
+            hostgroups = params.get('hostgroups')
+            provider_hostgroups = self.zabbix_provider.dbaas_api.client_group_host
             method_called = call.get('method')
 
             self.assertEqual(ip, host.address)
             self.assertEqual(hostname, host.hostname)
-            self.assertEquals(clientgroup, provider_clientgroup)
+            self.assertEquals(hostgroups, provider_hostgroups)
             self.assertEqual(method_called, method)
             self.assertNotIn("notification_slack", params)
 
@@ -115,7 +115,7 @@ class TestZabbixApi(unittest.TestCase):
                       "port": "80", "regexp": "WORKING",
                       "uri": "/health-check/redis-con/", "var": "redis-con",
                       "alarm": "yes", "notes": dbinfra_name,
-                      "clientgroup": self.dbaas_api.client_group_database}
+                      "hostgroups": self.dbaas_api.client_group_database}
 
             self.zabbix_provider._create_web_monitors(**params)
         self.asset_create_web_monitors(instances, params)
