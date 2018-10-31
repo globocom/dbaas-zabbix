@@ -314,7 +314,7 @@ class MongoDBFourDotZeroSingleZabbixProvider(MongoDBThreeDotFourSingleZabbixProv
 
     def create_mongodb_monitors(self, instance):
         self._create_mongo_three_monitors(
-            host=instance.dns, alarm="group",
+            host=instance.dns, alarm="yes", doc=self.alarm_notes,
             replicaset="0", mongo_version="4.0",
             **self.get_database_monitors_extra_parameters()
         )
@@ -387,7 +387,7 @@ class MongoDBFourDotZeroHighAvailabilityZabbixProvider(
 
     def create_mongodb_monitors(self, instance):
         self._create_mongo_three_monitors(
-            host=instance.dns, alarm="group",
+            host=instance.dns, alarm="yes", doc=self.alarm_notes,
             replicaset="1", mongo_version="4.0",
             **self.get_database_monitors_extra_parameters()
         )
