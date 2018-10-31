@@ -307,6 +307,19 @@ class MongoDBThreeDotFourSingleZabbixProvider(MongoDBThreeDotZeroSingleZabbixPro
         )
 
 
+class MongoDBFourDotZeroSingleZabbixProvider(MongoDBThreeDotFourSingleZabbixProvider):
+    __provider_name__ = 'mongodb'
+    __is_ha__ = False
+    __version__ = ['4.0.3', ]
+
+    def create_mongodb_monitors(self, instance):
+        self._create_mongo_three_monitors(
+            host=instance.dns, alarm="group",
+            replicaset="0", mongo_version="4.0",
+            **self.get_database_monitors_extra_parameters()
+        )
+
+
 class MongoDBHighAvailabilityZabbixProvider(MongoDBSingleZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = True
@@ -361,6 +374,21 @@ class MongoDBThreeDotFourHighAvailabilityZabbixProvider(
         self._create_mongo_three_monitors(
             host=instance.dns, alarm="yes", doc=self.alarm_notes,
             replicaset="1", mongo_version="3.4",
+            **self.get_database_monitors_extra_parameters()
+        )
+
+
+class MongoDBFourDotZeroHighAvailabilityZabbixProvider(
+    MongoDBThreeDotFourHighAvailabilityZabbixProvider
+):
+    __provider_name__ = 'mongodb'
+    __is_ha__ = True
+    __version__ = ['4.0.3', ]
+
+    def create_mongodb_monitors(self, instance):
+        self._create_mongo_three_monitors(
+            host=instance.dns, alarm="group",
+            replicaset="1", mongo_version="4.0",
             **self.get_database_monitors_extra_parameters()
         )
 
