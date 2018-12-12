@@ -211,6 +211,7 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             self._create_redis_monitors(
                 host=instance.dns, password=instance.databaseinfra.password,
                 port=str(instance.port), alarm='yes', notes=notes,
+                doc=notes, project="dbaas",
                 **self.get_database_monitors_extra_parameters()
             )
 
