@@ -235,6 +235,8 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             zabbix_hosts.append(host)
             host = "redis_{}:{}".format(instance.dns, instance.port)
             zabbix_hosts.append(host)
+            host = "redis_{}:{}_dbaas".format(instance.dns, instance.port)
+            zabbix_hosts.append(host)
 
         for instance in self.non_database_instances:
             host = "web_{}{}sentinel-con/".format(instance.dns, suffix)
