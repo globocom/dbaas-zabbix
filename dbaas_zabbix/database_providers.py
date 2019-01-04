@@ -50,17 +50,21 @@ class DatabaseZabbixProvider(ZabbixProvider):
 
     def disable_alarms(self,):
         for host in self.hosts:
-            self.disable_alarms_to(host_name=host.hostname)
+            if self.get_host_id(host.hostname):
+                self.disable_alarms_to(host_name=host.hostname)
 
         for database_host in self.get_zabbix_databases_hosts():
-            self.disable_alarms_to(host_name=database_host)
+            if self.get_host_id(database_host):
+                self.disable_alarms_to(host_name=database_host)
 
     def enable_alarms(self,):
         for host in self.hosts:
-            self.enable_alarms_to(host_name=host.hostname)
+            if self.get_host_id(host.hostname):
+                self.enable_alarms_to(host_name=host.hostname)
 
         for database_host in self.get_zabbix_databases_hosts():
-            self.enable_alarms_to(host_name=database_host)
+            if self.get_host_id(database_host):
+                self.enable_alarms_to(host_name=database_host)
 
     def disable_alarms_to(self, host_name):
         return self._disable_alarms(host=host_name)
