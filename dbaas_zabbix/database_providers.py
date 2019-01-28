@@ -81,7 +81,7 @@ class DatabaseZabbixProvider(ZabbixProvider):
 class MySQLSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mysql'
     __is_ha__ = False
-    __version__ = ['5.6.15', '5.6.24', '5.6.40', '5.7.21']
+    __version__ = ['5.6.15', '5.6.24', '5.6.40', '5.7.21', '5.7.25']
 
     def create_database_monitors(self,):
         for instance in self.instances:
@@ -139,16 +139,13 @@ class MySQLHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
 class MySQLFoxHighAvailabilityZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mysql'
     __is_ha__ = True
-    __version__ = ['5.6.24', '5.6.40', '5.7.21']
+    __version__ = ['5.6.24', '5.6.40', '5.7.21', '5.7.25']
 
     def create_database_monitors(self,):
         extra_parameters = self.get_database_monitors_extra_parameters()
         for instance in self.database_instances:
             self.create_instance_monitors(instance)
 
-        LOG.info('RICK01 - mysql_infra_dns_from_endpoint_dns')
-        LOG.info("{}, {}, {}".format(
-            self.mysql_infra_dns_from_endpoint_dns, extra_parameters))
         self._create_database_monitors(
             host=self.mysql_infra_dns_from_endpoint_dns, dbtype='mysql',
             alarm='yes', **extra_parameters)
