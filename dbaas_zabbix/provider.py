@@ -176,3 +176,20 @@ class ZabbixProvider(object):
             if hostgroup['name'] == hostgroup_name:
                 return hostgroup['groupid']
         return None
+
+    def add_hostgroup_on_host(self, host_name, hostgroup_name):
+
+        host_id = self.get_host_id(host_name=host_name)
+        if not host_id:
+            LOG.info('Host id not found for host: {}'.format(host_name))
+
+        hostgroup_id = self.get_hostgroup_id(hostgroup_name=hostgroup_name)
+        if not hostgroup_id:
+            LOG.info('Hostgroup id not found for hostgroup: {}'.format(
+                hostgroup_name))
+
+        self.api.hostgroup.massadd(
+            groups={'groupid': 'hostgroup_id'},
+            hosts=[host_id,]
+        )
+
