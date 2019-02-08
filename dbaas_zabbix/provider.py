@@ -189,7 +189,7 @@ class ZabbixProvider(object):
                 hostgroup_name))
 
         self.api.hostgroup.massadd(
-            groups={'groupid': 'hostgroup_id'},
+            groups={'groupid': hostgroup_id},
             hosts=[host_id,]
         )
 
