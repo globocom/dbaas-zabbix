@@ -167,3 +167,12 @@ class ZabbixProvider(object):
                     return False
 
         return True
+
+    def get_hostgroup_id(self, hostgroup_name):
+        hostgroups = self.api.hostgroup.get(
+            search={'name': hostgroup_name})
+
+        for hostgroup in hostgroups:
+            if hostgroup['name'] == hostgroup_name:
+                return hostgroup['groupid']
+        return None
