@@ -11,6 +11,9 @@ def set_client_group(attribute):
         def wrapper(*args, **kwargs):
             self = args[0]
             kwargs["hostgroups"] = list(getattr(self.dbaas_api, attribute))
+            org_hostgroup = self.dbaas_api.organization_hostgroup
+            if org_hostgroup:
+                kwargs["hostgroups"] += [org_hostgroup,]
             return method(*args, **kwargs)
 
         return wrapper
@@ -167,3 +170,48 @@ class ZabbixProvider(object):
                     return False
 
         return True
+
+    def get_hostgroup_id(self, hostgroup_name):
+        hostgroups = self.api.hostgroup.get(
+            search={'name': hostgroup_name})
+
+        for hostgroup in hostgroups:
+            if hostgroup['name'] == hostgroup_name:
+                return hostgroup['groupid']
+        return None
+
+    def add_hostgroup_on_host(self, host_name, hostgroup_name):
+
+        host_id = self.get_host_id(host_name=host_name)
+        if not host_id:
+            LOG.info('Host id not found for host: {}'.format(host_name))
+            return
+
+        hostgroup_id = self.get_hostgroup_id(hostgroup_name=hostgroup_name)
+        if not hostgroup_id:
+            LOG.info('Hostgroup id not found for hostgroup: {}'.format(
+                hostgroup_name))
+            return
+
+        self.api.hostgroup.massadd(
+            groups={'groupid': hostgroup_id},
+            hosts=[host_id,]
+        )
+
+    def remove_hostgroup_on_host(self, host_name, hostgroup_name):
+
+        host_id = self.get_host_id(host_name=host_name)
+        if not host_id:
+            LOG.info('Host id not found for host: {}'.format(host_name))
+            return
+
+        hostgroup_id = self.get_hostgroup_id(hostgroup_name=hostgroup_name)
+        if not hostgroup_id:
+            LOG.info('Hostgroup id not found for hostgroup: {}'.format(
+                hostgroup_name))
+            return
+
+        self.api.hostgroup.massremove(
+            groupids=[hostgroup_id],
+            hostids=[host_id]
+        )

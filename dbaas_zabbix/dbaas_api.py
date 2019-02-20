@@ -80,3 +80,14 @@ class DatabaseAsAServiceApi(object):
     @property
     def slack_notification(self):
         return self.credentials.get_parameter_by_name("slack_notification")
+
+    @property
+    def database(self):
+        return self.databaseinfra.databases.first()
+
+    @property
+    def organization_hostgroup(self):
+        organization = self.database.team.organization
+        if organization:
+            return organization.get_grafana_hostgroup_external_org()
+        return None

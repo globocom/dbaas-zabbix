@@ -234,8 +234,6 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
             zabbix_hosts.append(host)
             host = "web_{}{}redis-mem/".format(instance.dns, suffix)
             zabbix_hosts.append(host)
-            host = "redis_{}:{}".format(instance.dns, instance.port)
-            zabbix_hosts.append(host)
             host = "redis_{}:{}_dbaas".format(instance.dns, instance.port)
             zabbix_hosts.append(host)
 
