@@ -30,6 +30,24 @@ class Instance(object):
         self.hostname = hostname
 
 
+class Team(object):
+    def __init__(self, name):
+        self.name = name
+
+    @property
+    def organization(self):
+        return None
+
+
+class Database(object):
+    def __init__(self, name):
+        self.name = name
+        self.team = Team(name)
+
+    def first(self):
+        return self
+
+
 class Driver(object):
     def __init__(self, databaseinfra):
         self.databaseinfra = databaseinfra
@@ -54,6 +72,7 @@ class DatabaseInfra(object):
         self.engine = Engine(name)
         self.plan = plan
         self.cs_dbinfra_attributes = CloudStackInfra()
+        self.databases = Database(name)
 
     def get_driver(self):
         if hasattr(self, 'driver'):
