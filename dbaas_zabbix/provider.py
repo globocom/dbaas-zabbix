@@ -45,6 +45,11 @@ class ZabbixProvider(object):
         self.api = zabbix_api(dbaas_api.endpoint)
         self.api.login(user=dbaas_api.user, password=dbaas_api.password)
 
+    @property
+    def zabbix_version(self):
+        version = self.dbaas_api.engine_version.split('.')
+        return "{}.{}".format(version[0], version[1])
+
     def logout(self):
         try:
             self.api.user.logout()
@@ -62,18 +67,6 @@ class ZabbixProvider(object):
     def _create_basic_monitors(self, **kwargs):
         LOG.info("Creating basic monitor with params: {}".format(kwargs))
         return self.api.globo.createLinuxMonitors(**kwargs)
-
-    @set_client_group("client_group_database")
-    @set_slack_notification()
-    def _create_database_monitors(self, **kwargs):
-        LOG.info("Creating database monitor with params: {}".format(kwargs))
-        return self.api.globo.createDBMonitors(**kwargs)
-
-    @set_client_group("client_group_database")
-    @set_slack_notification()
-    def _create_mongo_three_monitors(self, **kwargs):
-        LOG.info("Creating mongo3 monitor with params: {}".format(kwargs))
-        return self.api.globo.createMongo3Monitors(**kwargs)
 
     @set_client_group("client_group_database")
     @set_slack_notification()

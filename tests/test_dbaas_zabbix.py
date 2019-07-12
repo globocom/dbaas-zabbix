@@ -183,29 +183,27 @@ class TestZabbixApi(unittest.TestCase):
         self.assertEqual(last_call_params["hostid"], "2132")
         self.assertEqual(last_call["method"], "host.update")
 
-    def test_create_db_monitors(self):
-        self.zabbix_provider._create_database_monitors(
-            dbtype='fake', alarm='group', host='fake01.test.com')
+    def test_create_mysql_monitors(self):
+        self.zabbix_provider._create_mysql_monitors(
+            alarm='group', host='fake01.test.com')
 
         last_call = self.zabbix_provider.api.last_call[0]
         last_call_params = last_call['params']
-        self.assertEquals(last_call_params["dbtype"], 'fake')
         self.assertEquals(last_call_params["alarm"], 'group')
         self.assertEquals(last_call_params["host"], 'fake01.test.com')
-        self.assertEquals(last_call["method"], "globo.createDBMonitors")
+        self.assertEquals(last_call["method"], "globo.createMySQLMonitors")
         self.assert_slack(last_call_params)
 
-    def test_create_mongo_three_monitors(self):
-        self.zabbix_provider._create_mongo_three_monitors(
-            dbtype='fake', alarm='group', host='fake02.test.com'
+    def test_create_mongo_monitors(self):
+        self.zabbix_provider._create_mongo_monitors(
+            alarm='group', host='fake02.test.com'
         )
 
         last_call = self.zabbix_provider.api.last_call[0]
         last_call_params = last_call['params']
-        self.assertEquals(last_call_params["dbtype"], 'fake')
         self.assertEquals(last_call_params["alarm"], 'group')
         self.assertEquals(last_call_params["host"], 'fake02.test.com')
-        self.assertEquals(last_call["method"], "globo.createMongo3Monitors")
+        self.assertEquals(last_call["method"], "globo.createMongoMonitors")
         self.assert_slack(last_call_params)
 
     def test_update_host_interface(self):
