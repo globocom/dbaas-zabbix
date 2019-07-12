@@ -91,6 +91,17 @@ class ZabbixProvider(object):
     def _create_redis_monitors(self, **kwargs):
         return self.api.globo.createRedisMonitors(**kwargs)
 
+    @set_client_group("client_group_database")
+    @set_slack_notification()
+    def _create_mongo_monitors(self, **kwargs):
+        return self.api.globo.createMongoMonitors(**kwargs)
+
+    @set_client_group("client_group_database")
+    @set_slack_notification()
+    def _create_mysql_monitors(self, **kwargs):
+        return self.api.globo.createMySQLMonitors(**kwargs)
+
+
     def _get_host_info(self, **kwargs):
         return self.api.host.get(**kwargs)
 
