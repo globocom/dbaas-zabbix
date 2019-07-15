@@ -90,7 +90,6 @@ class MySQLZabbixProvider(DatabaseZabbixProvider):
 class MySQLSingleZabbixProvider(MySQLZabbixProvider):
     __provider_name__ = 'mysql'
     __is_ha__ = False
-    __version__ = ['5.6.40', '5.7.21', '5.7.25']
 
     def create_database_monitors(self,):
         for instance in self.instances:
@@ -107,7 +106,6 @@ class MySQLSingleZabbixProvider(MySQLZabbixProvider):
 class MySQLHighAvailabilityZabbixProvider(MySQLZabbixProvider):
     __provider_name__ = 'mysql'
     __is_ha__ = True
-    __version__ = ['5.6.40', '5.7.21', '5.7.25']
 
     def create_database_monitors(self,):
         extra_parameters = self.get_database_monitors_extra_parameters()
@@ -225,19 +223,16 @@ class RedisZabbixProvider(DatabaseZabbixProvider):
 class RedisSingleZabbixProvider(RedisZabbixProvider):
     __provider_name__ = 'redis'
     __is_ha__ = False
-    __version__ = ['2.8.17', '3.2.6', '4.0.2']
 
 
 class RedisHighAvailabilityZabbixProvider(RedisZabbixProvider):
     __provider_name__ = 'redis'
     __is_ha__ = True
-    __version__ = ['2.8.17', '3.2.6', '4.0.2']
 
 
 class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = False
-    __version__ = ['3.0.12', '3.4.1', '4.0.3']
 
     def create_database_monitors(self,):
         for instance in self.database_instances:
@@ -266,7 +261,6 @@ class MongoDBSingleZabbixProvider(DatabaseZabbixProvider):
 class MongoDBHighAvailabilityZabbixProvider(MongoDBSingleZabbixProvider):
     __provider_name__ = 'mongodb'
     __is_ha__ = True
-    __version__ = ['3.0.12', '3.4.1', '4.0.3']
 
     def create_arbiter_monitors(self, instance):
         self._create_tcp_monitors(
@@ -296,10 +290,8 @@ class MongoDBHighAvailabilityZabbixProvider(MongoDBSingleZabbixProvider):
 class FakeSingleZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'fake'
     __is_ha__ = False
-    __version__ = ['0.0.0', ]
 
 
 class FakeHAZabbixProvider(DatabaseZabbixProvider):
     __provider_name__ = 'fake'
     __is_ha__ = True
-    __version__ = ['1.1.1', ]

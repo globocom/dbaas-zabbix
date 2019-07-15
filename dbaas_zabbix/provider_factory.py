@@ -3,13 +3,12 @@ from dbaas_zabbix import database_providers
 
 class ProviderFactory(object):
     @classmethod
-    def get_provider_class(cls, driver_name, is_ha, version):
+    def get_provider_class(cls, driver_name, is_ha,):
         for klass in available_providers():
             name_eq_klass = driver_name == klass.__provider_name__
             is_ha_eq_klass = is_ha == klass.__is_ha__
-            version_eq_klass = version in klass.__version__
 
-            if name_eq_klass and is_ha_eq_klass and version_eq_klass:
+            if name_eq_klass and is_ha_eq_klass:
                 return klass
 
         raise NotImplementedError
@@ -18,19 +17,13 @@ class ProviderFactory(object):
     def factory(cls, dbaas_api, **kwargs):
         engine_name = dbaas_api.engine_name
         is_ha = dbaas_api.is_ha
-        engine_version = dbaas_api.engine_version
         if kwargs.get('engine_name'):
             engine_name = kwargs.get('engine_name')
             del kwargs['engine_name']
         if kwargs.get('is_ha'):
             is_ha = kwargs.get('is_ha')
             del kwargs['is_ha']
-        if kwargs.get('engine_version'):
-            engine_version = kwargs.get('engine_version')
-            del kwargs['engine_version']
-        driver_class = cls.get_provider_class(engine_name,
-                                              is_ha,
-                                              engine_version)
+        driver_class = cls.get_provider_class(engine_name, is_ha)
         return driver_class(dbaas_api=dbaas_api, **kwargs)
 
 
