@@ -75,7 +75,7 @@ class DatabaseAsAServiceApi(object):
 
     @property
     def engine_version(self):
-        return self.databaseinfra.engine.version
+        return self.databaseinfra.engine_patch.full_version
 
     @property
     def slack_notification(self):
