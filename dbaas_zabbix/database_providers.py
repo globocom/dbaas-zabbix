@@ -149,6 +149,18 @@ class MySQLHighAvailabilityZabbixProvider(MySQLZabbixProvider):
             alarm='yes', **extra_parameters)
 
 
+class MySQLPerconaSingleZabbixProvider(MySQLSingleZabbixProvider):
+    __provider_name__ = 'mysql_percona'
+    __is_ha__ = False
+
+
+class MySQLPerconaHighAvailabilityZabbixProvider(
+    MySQLHighAvailabilityZabbixProvider
+):
+    __provider_name__ = 'mysql_percona'
+    __is_ha__ = True
+
+
 class RedisZabbixProvider(DatabaseZabbixProvider):
 
     def get_web_monitors_extra_parameters(self,):
