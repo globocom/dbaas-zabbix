@@ -1,4 +1,4 @@
-# dbaas-zabbix
+# dbaas-zabbix [![Build Status](https://travis-ci.org/globocom/dbaas-zabbix.svg?branch=master)](https://travis-ci.org/globocom/dbaas-zabbix)
 A DBaaS zabbix integration
 
 ### Local Deploy
