@@ -62,7 +62,7 @@ class ZabbixMetrics(object):
 
     def get_last_value(self, key, host):
         from time import localtime, mktime
-        current_time = mktime(localtime())
+        current_time = int(mktime(localtime()))
 
         metrics = self.get_metrics(
             time_from=current_time-3600,
