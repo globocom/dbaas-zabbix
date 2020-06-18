@@ -18,7 +18,7 @@ readme = open('README.rst').read()
 
 setup(
     name='dbaas_zabbix',
-    version='0.7.2',
+    version='0.7.3',
     description='A Zabbix Integration for DBaaS.',
     long_description=readme,
     author='Felippe Raposo',
