@@ -219,3 +219,11 @@ class ZabbixProvider(object):
             groupids=[hostgroup_id],
             hostids=[host_id]
         )
+
+    def update_macro(self, host_name, macro, value):
+        self.api.globo.updateMacro(
+            host_name=host_name,
+            macro=macro,
+            value=value
+        )
+
