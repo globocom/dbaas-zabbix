@@ -45,11 +45,12 @@ docs:
 	open docs/_build/html/index.html
 
 release:
-	python setup.py sdist upload
+	python setup.py sdist bdist_wheel
+	twine upload dist/*
 
 release_globo:
-	python setup.py sdist register -r ipypiglobo
-	python setup.py sdist register -r pypiglobo
+	python setup.py sdist bdist_wheel
+	twine upload --repository-url https://artifactory.globoi.com/artifactory/api/pypi/pypi-local dist/*
 
 fake_deploy:
 	rm -f /Users/$(USER)/.virtualenvs/dbaas/lib/python2.7/site-packages/dbaas_zabbix/__init__.pyc

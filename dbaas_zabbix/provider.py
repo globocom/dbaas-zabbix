@@ -43,6 +43,7 @@ class ZabbixProvider(object):
     def __init__(self, dbaas_api, zabbix_api):
         self.dbaas_api = dbaas_api
         self.api = zabbix_api(dbaas_api.endpoint)
+        self.api.session.verify=False
         self.api.login(user=dbaas_api.user, password=dbaas_api.password)
 
     @property
