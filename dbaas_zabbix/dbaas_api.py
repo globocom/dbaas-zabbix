@@ -97,6 +97,6 @@ class DatabaseAsAServiceApi(object):
     @property
     def using_agent(self):
         zabbix_agent = self.credentials.get_parameter_by_name("zabbix_agent")
-        if zabbix_agent.lower == 'true':
+        if zabbix_agent.lower() == 'true':
             return True
         return False
