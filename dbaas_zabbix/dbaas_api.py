@@ -55,6 +55,8 @@ class DatabaseAsAServiceApi(object):
 
     @property
     def hosts(self):
+        if self.using_agent:
+            return []
         return list({instance.hostname for instance in self.instances})
 
     @property
@@ -91,3 +93,10 @@ class DatabaseAsAServiceApi(object):
         if organization:
             return organization.get_grafana_hostgroup_external_org()
         return None
+
+    @property
+    def using_agent(self):
+        zabbix_agent = self.credentials.get_parameter_by_name("zabbix_agent")
+        if zabbix_agent.lower == 'true':
+            return True
+        return False
