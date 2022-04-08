@@ -11,12 +11,12 @@ class ZabbixMetrics(object):
         self.api = zappix_api
         self.group = group
 
-    def get_items(self, key, host_name):
+    def get_items(self, key, hostname):
         return self.api.item.get(
                 output=['itemid', 'value_type'],
                 search={'key_': key},
                 group=self.group,
-                filter={'host': host_name, 'status': 0, 'state': 0}
+                filter={'host': hostname, 'status': 0, 'state': 0}
             )
 
     def get_history(self, value_type, items, time_from, time_till):
@@ -28,14 +28,14 @@ class ZabbixMetrics(object):
             time_till=time_till
         )
 
-    def get_metrics(self, time_from, time_till, keys, host):
+    def get_metrics(self, time_from, time_till, keys, hostname):
         items = {}
         value_type = 0
 
         for key in keys:
-            item = self.get_items(key, host.hostname)
+            item = self.get_items(key, hostname)
             if not item:
-                raise ZabbixApiKeyNotFoundError(host=host.hostname, key=key)
+                raise ZabbixApiKeyNotFoundError(host=hostname, key=key)
 
             value_type = item[0]['value_type']
             items[item[0]['itemid']] = key
@@ -48,7 +48,7 @@ class ZabbixMetrics(object):
 
         if not histories:
             raise ZabbixApiNoDataBetweenTimeError(
-                host=host.hostname, keys=keys,
+                host=hostname, keys=keys,
                 time_from=time_from, time_till=time_till
             )
 
@@ -60,7 +60,7 @@ class ZabbixMetrics(object):
 
         return metrics
 
-    def get_last_value(self, key, host):
+    def get_last_value(self, key, hostname):
         from time import localtime, mktime
         current_time = int(mktime(localtime()))
 
@@ -68,15 +68,15 @@ class ZabbixMetrics(object):
             time_from=current_time-3600,
             time_till=current_time,
             keys=[key],
-            host=host
+            hostname=hostname
         )[key]
         last_key = metrics.keys()[-1]
         return metrics[last_key]
 
-    def get_current_disk_data_size(self, host):
-        current_value = self.get_last_value(key=KEY_DISK_SIZE_DATA, host=host)
+    def get_current_disk_data_size(self, hostname):
+        current_value = self.get_last_value(key=KEY_DISK_SIZE_DATA, hostname=hostname)
         return int(current_value) / 1024
 
-    def get_current_disk_data_used(self, host):
-        current_value = self.get_last_value(key=KEY_DISK_USED_DATA, host=host)
+    def get_current_disk_data_used(self, hostname):
+        current_value = self.get_last_value(key=KEY_DISK_USED_DATA, hostname=hostname)
         return int(current_value) / 1024
