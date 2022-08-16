@@ -1,17 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import logging
-import sys
-
 from dbaas_zabbix.dbaas_api import DatabaseAsAServiceApi
 from dbaas_zabbix.provider_factory import ProviderFactory
 from pyzabbix import ZabbixAPI
 
-stream = logging.StreamHandler(sys.stdout)
-stream.setLevel(logging.DEBUG)
-log = logging.getLogger('pyzabbix')
-log.addHandler(stream)
-log.setLevel(logging.DEBUG)
 
 def factory_for(**kwargs):
     databaseinfra = kwargs['databaseinfra']
