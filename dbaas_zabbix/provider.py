@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
+import requests
+import os
 
 LOG = logging.getLogger(__name__)
 STATUS_ENABLE = 0
@@ -44,7 +46,24 @@ class ZabbixProvider(object):
         self.dbaas_api = dbaas_api
         self.api = zabbix_api(dbaas_api.endpoint)
         self.api.session.verify=False
-        self.api.login(user=dbaas_api.user, password=dbaas_api.password)
+
+        zabbix_new_login_endpoint = os.getenv('ZABBIX_NEW_LOGIN_ENDPOINT', None)
+
+        if zabbix_new_login_endpoint:
+
+            headers = {'Content-Type': 'application/json'} 
+            data = { "params" : { "user": dbaas_api.user, "password": dbaas_api.password}}
+            r = requests.post(zabbix_new_login_endpoint, json=data, headers=headers, verify=False)
+
+            if r.status_code == 200 or r.status_code == 201:
+                r_data = r.json()
+                token = r_data['result']
+                self.api.auth = token 
+                
+        # Old API login
+        else:
+            self.api.login(user=dbaas_api.user, password=dbaas_api.password)
+        
 
     @property
     def zabbix_version(self):
