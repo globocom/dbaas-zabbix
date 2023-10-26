@@ -49,6 +49,9 @@ class ZabbixProvider(object):
 
         zabbix_new_login_endpoint = os.getenv('ZABBIX_NEW_LOGIN_ENDPOINT', None)
 
+        if zabbix_new_login_endpoint == "0" or zabbix_new_login_endpoint=="false":
+            zabbix_new_login_endpoint = None
+
         if zabbix_new_login_endpoint:
 
             headers = {'Content-Type': 'application/json'} 
