@@ -1,8 +1,14 @@
 from collections import OrderedDict
 from dbaas_zabbix.errors import ZabbixApiKeyNotFoundError, ZabbixApiNoDataBetweenTimeError
 
-KEY_DISK_SIZE_DATA = 'hrStorageSizeInBytes[/data]'
-KEY_DISK_USED_DATA = 'hrStorageUsedInBytes[/data]'
+# Old Keys
+# KEY_DISK_SIZE_DATA = 'hrStorageSizeInBytes[/data]'
+# KEY_DISK_USED_DATA = 'hrStorageUsedInBytes[/data]'
+
+# New Keys
+# Values in Bytes
+KEY_DISK_SIZE_DATA = 'vfs.fs.size[/data,total]'
+KEY_DISK_USED_DATA = 'vfs.fs.size[/data,used]'
 
 
 class ZabbixMetrics(object):
